@@ -6,14 +6,7 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 
 import { Button } from "@/components/ui/button"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
+import { ResponsiveDialogOrDrawer } from "@/components/ui/ResponsiveDialogOrDrawer"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -70,7 +63,6 @@ export function EditCarModal({ car, open, onOpenChange, onUpdateCar }: EditCarMo
     },
   })
 
-  // Update form when car changes
   useEffect(() => {
     if (car) {
       form.reset({
@@ -84,7 +76,6 @@ export function EditCarModal({ car, open, onOpenChange, onUpdateCar }: EditCarMo
         dailyRate: car.dailyRate ? car.dailyRate.toString() : "",
       })
 
-      // Set images if they exist
       if (car.images) {
         setImages(car.images)
         if (car.primaryImage) {
@@ -114,18 +105,24 @@ export function EditCarModal({ car, open, onOpenChange, onUpdateCar }: EditCarMo
     }
 
     let finalImageUrls = [...images];
+    let currentPrimaryIndex = primaryImageIndex;
 
     try {
-      // Upload any pending images from ImageUpload component
       if (imageUploadRef.current && imageUploadRef.current.getPendingFilesCount() > 0) {
-        console.log("[EditCarModal] Found pending files. Triggering upload...");
         const newUploadedUrls = await imageUploadRef.current.uploadPendingFilesAndGetUrls();
         if (newUploadedUrls.length > 0) {
           finalImageUrls = [...finalImageUrls, ...newUploadedUrls];
           setImages(finalImageUrls);
-          imageUploadRef.current.clearPendingFiles();
         }
-        console.log("[EditCarModal] Pending files processed. New URLs:", newUploadedUrls);
+        imageUploadRef.current.clearPendingFiles();
+      }
+
+      if (finalImageUrls.length > 0 && (currentPrimaryIndex < 0 || currentPrimaryIndex >= finalImageUrls.length)) {
+        currentPrimaryIndex = 0;
+        setPrimaryImageIndex(0);
+      } else if (finalImageUrls.length === 0) {
+        currentPrimaryIndex = -1;
+        setPrimaryImageIndex(-1);
       }
 
       const updatedCar = {
@@ -139,21 +136,18 @@ export function EditCarModal({ car, open, onOpenChange, onUpdateCar }: EditCarMo
         status: values.status,
         dailyRate: Number.parseFloat(values.dailyRate),
         images: finalImageUrls,
-        primaryImage: primaryImageIndex >= 0 && finalImageUrls[primaryImageIndex] ? finalImageUrls[primaryImageIndex] : null,
+        primaryImage: currentPrimaryIndex >= 0 && finalImageUrls[currentPrimaryIndex]
+                        ? finalImageUrls[currentPrimaryIndex]
+                        : null,
       }
       
-      console.log("[EditCarModal] Calling onUpdateCar with:", updatedCar);
       const result = await onUpdateCar(updatedCar);
-      console.log("[EditCarModal] Received result from onUpdateCar:", result);
 
       if (result && result.success) {
-        console.log("[EditCarModal] onUpdateCar was successful. Closing modal.");
         setActiveTab("details")
         onOpenChange(false)
       } else {
-        console.log("[EditCarModal] onUpdateCar reported an error or no success. Result:", result);
         const errorMessage = result?.error || "An unexpected error occurred while updating the car. Please try again.";
-        console.log("[EditCarModal TOASTING FOR ERROR] Message:", errorMessage);
         toast({
           title: "Error Updating Car",
           description: errorMessage,
@@ -161,11 +155,10 @@ export function EditCarModal({ car, open, onOpenChange, onUpdateCar }: EditCarMo
         })
       }
 
-    } catch (error: any) { // This catch block should ideally not be hit for handled server errors
-      console.error("[EditCarModal] UNEXPECTED error caught in onSubmit try/catch block:", error);
+    } catch (error: any) {
       const errorMessage = error?.message || "An unexpected client-side error occurred. Please try again.";
       toast({
-        title: "Critical Client Error",
+        title: "Critical ClientError",
         description: errorMessage,
         variant: "destructive",
       })
@@ -182,202 +175,205 @@ export function EditCarModal({ car, open, onOpenChange, onUpdateCar }: EditCarMo
     }
   }
 
+  const modalTitle = "Edit Car";
+  const modalDescription = "Update the details of this car.";
+  const modalFooter = (
+    <>
+      <Button type="button" variant="outline" onClick={handleClose} disabled={isSubmitting}>
+        Cancel
+      </Button>
+      <Button type="submit" form="edit-car-form" disabled={isSubmitting}>
+        {isSubmitting ? "Updating..." : "Update Car"}
+      </Button>
+    </>
+  );
+
   return (
-    <Dialog
+    <ResponsiveDialogOrDrawer
       open={open}
       onOpenChange={(newOpen) => {
         if (!isSubmitting) {
           onOpenChange(newOpen)
+          if (!newOpen) { 
+          }
         }
       }}
+      title={modalTitle}
+      description={modalDescription}
+      footer={modalFooter}
+      className="sm:max-w-[600px]"
     >
-      <DialogContent className="sm:max-w-[600px]">
-        <DialogHeader>
-          <DialogTitle>Edit Car</DialogTitle>
-          <DialogDescription>Update the details of this car.</DialogDescription>
-        </DialogHeader>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="details">Car Details</TabsTrigger>
+          <TabsTrigger value="images">Images</TabsTrigger>
+        </TabsList>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="details">Car Details</TabsTrigger>
-            <TabsTrigger value="images">Images</TabsTrigger>
-          </TabsList>
+        <Form {...form}>
+          <form id="edit-car-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
+            <TabsContent value="details" className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="make"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Make</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Toyota" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="model"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Model</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Camry" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
-              <TabsContent value="details" className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="make"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Make</FormLabel>
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="year"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Year</FormLabel>
+                      <FormControl>
+                        <Input placeholder="2023" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="category"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Category</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value || ""}>
                         <FormControl>
-                          <Input placeholder="Toyota" {...field} />
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select category" />
+                          </SelectTrigger>
                         </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="model"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Model</FormLabel>
+                        <SelectContent>
+                          <SelectItem value="Sedan">Sedan</SelectItem>
+                          <SelectItem value="SUV">SUV</SelectItem>
+                          <SelectItem value="Luxury">Luxury</SelectItem>
+                          <SelectItem value="Electric">Electric</SelectItem>
+                          <SelectItem value="Compact">Compact</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="color"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Color</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Black" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="licensePlate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>License Plate</FormLabel>
+                      <FormControl>
+                        <Input placeholder="ABC-1234" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="status"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Status</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value || ""}>
                         <FormControl>
-                          <Input placeholder="Camry" {...field} />
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select status" />
+                          </SelectTrigger>
                         </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                        <SelectContent>
+                          <SelectItem value="Available">Available</SelectItem>
+                          <SelectItem value="Rented">Rented</SelectItem>
+                          <SelectItem value="Maintenance">Maintenance</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="dailyRate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Daily Rate ($)</FormLabel>
+                      <FormControl>
+                        <Input placeholder="65.00" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </TabsContent>
+
+            <TabsContent value="images">
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-sm font-medium mb-2">Car Images</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Update the images for this car. The primary image will be displayed in the car list.
+                  </p>
                 </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="year"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Year</FormLabel>
-                        <FormControl>
-                          <Input placeholder="2023" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="category"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Category</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value || ""}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select category" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="Sedan">Sedan</SelectItem>
-                            <SelectItem value="SUV">SUV</SelectItem>
-                            <SelectItem value="Luxury">Luxury</SelectItem>
-                            <SelectItem value="Electric">Electric</SelectItem>
-                            <SelectItem value="Compact">Compact</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="color"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Color</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Black" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="licensePlate"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>License Plate</FormLabel>
-                        <FormControl>
-                          <Input placeholder="ABC-1234" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="status"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Status</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value || ""}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select status" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="Available">Available</SelectItem>
-                            <SelectItem value="Rented">Rented</SelectItem>
-                            <SelectItem value="Maintenance">Maintenance</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="dailyRate"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Daily Rate ($)</FormLabel>
-                        <FormControl>
-                          <Input placeholder="65.00" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </TabsContent>
-
-              <TabsContent value="images">
-                <div className="space-y-4">
-                  <div>
-                    <h3 className="text-sm font-medium mb-2">Car Images</h3>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Update the images for this car. The primary image will be displayed in the car list.
-                    </p>
-                  </div>
-                  <ImageUpload
-                    ref={imageUploadRef}
-                    images={images}
-                    onImagesChange={(updatedImages) => {
-                      setImages(updatedImages)
-                      if (primaryImageIndex >= updatedImages.length) {
-                        setPrimaryImageIndex(updatedImages.length > 0 ? 0 : -1);
-                      }
-                    }}
-                    primaryImageIndex={primaryImageIndex}
-                    onPrimaryImageChange={setPrimaryImageIndex}
-                  />
-                </div>
-              </TabsContent>
-
-              <DialogFooter>
-                <Button type="button" variant="outline" onClick={handleClose} disabled={isSubmitting}>
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? "Updating..." : "Update Car"}
-                </Button>
-              </DialogFooter>
-            </form>
-          </Form>
-        </Tabs>
-      </DialogContent>
-    </Dialog>
+                <ImageUpload
+                  ref={imageUploadRef}
+                  images={images}
+                  onImagesChange={(updatedImages) => {
+                    setImages(updatedImages)
+                    if (primaryImageIndex >= updatedImages.length) {
+                      setPrimaryImageIndex(updatedImages.length > 0 ? 0 : -1);
+                    }
+                  }}
+                  primaryImageIndex={primaryImageIndex}
+                  onPrimaryImageChange={setPrimaryImageIndex}
+                />
+              </div>
+            </TabsContent>
+          </form>
+        </Form>
+      </Tabs>
+    </ResponsiveDialogOrDrawer>
   )
 }

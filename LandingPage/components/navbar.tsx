@@ -48,7 +48,9 @@ export default function Navbar() {
           <Link href="/login" className="text-sm font-medium hover:underline underline-offset-4">
             Log In
           </Link>
-          <Button size="sm">Sign Up</Button>
+          <Link href="/login">
+            <Button size="sm">Staff login</Button>
+          </Link>
         </div>
 
         {/* Mobile Menu Button */}
@@ -120,9 +122,11 @@ export default function Navbar() {
             >
               Log In
             </Link>
-            <Button className="w-full" onClick={() => setIsMenuOpen(false)}>
-              Sign Up
-            </Button>
+            <Link href="/login" className="w-full">
+              <Button className="w-full" onClick={() => setIsMenuOpen(false)}>
+                Staff login
+              </Button>
+            </Link>
           </div>
         </nav>
       </div>

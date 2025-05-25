@@ -221,7 +221,13 @@ export const ImageUpload = forwardRef<ImageUploadRef, ImageUploadProps>(
             className="hidden"
             onChange={handleChange}
           />
-          <label htmlFor="image-upload-input" className="cursor-pointer flex flex-col items-center text-center">
+          <label 
+            htmlFor="image-upload-input" 
+            className="cursor-pointer flex flex-col items-center text-center"
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+          >
             <Upload className="h-10 w-10 text-muted-foreground mb-2" />
             <p className="text-sm font-medium mb-1">
               Drag & drop images or click to browse

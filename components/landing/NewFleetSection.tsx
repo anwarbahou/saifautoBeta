@@ -1,0 +1,154 @@
+import Image from "next/image"
+import { Car, Fuel, Users, Cog } from "lucide-react"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { supabase } from "@/lib/supabaseClient"; // Import Supabase client
+
+// Removed unused carCategories static data
+
+export interface CarData {
+  id: string;
+  name: string;
+  make?: string;
+  model?: string;
+  type: string | null;
+  price_per_day: number | null;
+  image_url: string | null;
+  seats: number | null;
+  fuel_type: string | null;
+  transmission: string | null;
+}
+
+// Removed hardcoded SUPABASE_PROJECT_ID
+
+async function fetchCarsFromDB(): Promise<CarData[]> {
+  try {
+    const { data: cars_data, error } = await supabase
+      .from('cars')
+      .select('id, make, model, category, daily_rate, primary_image') // Select actual column names
+      .limit(6);
+
+    if (error) {
+      console.error("Error fetching cars from Supabase:", error);
+      // Log the full error for more details
+      if (error.message) console.error("Supabase error message:", error.message);
+      if (error.details) console.error("Supabase error details:", error.details);
+      if (error.hint) console.error("Supabase error hint:", error.hint);
+      return [];
+    }
+    if (!cars_data) {
+        console.warn("No data returned from Supabase for cars.");
+        return [];
+    }
+
+    // Map the fetched data to the CarData interface
+    const formattedCars: CarData[] = cars_data.map((car_item: any) => ({
+      id: car_item.id,
+      name: `${car_item.make || ''} ${car_item.model || ''}`.trim() || "Unknown Car",
+      type: car_item.category || "N/A",
+      price_per_day: car_item.daily_rate || 0,
+      image_url: car_item.primary_image || "/img/cars/car-placeholder.png", // Provide a fallback
+      seats: null, // Placeholder as it's not in the DB
+      fuel_type: null, // Placeholder as it's not in the DB
+      transmission: null, // Placeholder as it's not in the DB
+    }));
+
+    return formattedCars;
+  } catch (err) {
+    console.error("Exception during fetchCarsFromDB:", err);
+    return [];
+  }
+}
+
+export default async function NewFleetSection() {
+  const cars: CarData[] = await fetchCarsFromDB();
+
+  return (
+    <section id="fleet" className="py-16 md:py-20 bg-gray-50 dark:bg-gray-900">
+      <div className="container mx-auto px-4">
+        <div className="text-center mb-12 md:mb-16">
+          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl mb-4">Explore Our Fleet</h2>
+          <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+            Choose from our wide range of vehicles to suit your needs and budget. From economy cars for city trips to
+            spacious SUVs for family adventures.
+          </p>
+        </div>
+
+        {cars && cars.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+            {cars.map((car_item) => (
+              <CarCard key={car_item.id} car={car_item} />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <Car className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
+            <h3 className="text-xl font-semibold mb-2">No Cars Available</h3>
+            <p className="text-muted-foreground">
+              We couldn't find any cars at the moment. Please check back later or contact support.
+            </p>
+          </div>
+        )}
+
+        <div className="mt-12 md:mt-16 text-center">
+          <Button asChild size="lg" className="text-lg font-semibold px-8 py-3">
+            <Link href="/fleet">View All Cars</Link>
+          </Button>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+export function CarCard({ car }: { car: CarData }) {
+  return (
+    <Card className="flex flex-col overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 bg-white dark:bg-gray-800">
+      <CardHeader className="p-0 relative">
+        <Link href={`/cars/${car.id}`} aria-label={`View details for ${car.name}`}>
+          <div className="aspect-[16/10] w-full overflow-hidden">
+            <Image
+              src={car.image_url || "/img/cars/car-placeholder.png"}
+              alt={car.name}
+              width={600}
+              height={375}
+              className="object-cover w-full h-full transition-transform duration-300 hover:scale-105"
+            />
+          </div>
+        </Link>
+        <Badge variant="default" className="absolute top-4 right-4 bg-primary text-primary-foreground">
+          {car.type || "N/A"}
+        </Badge>
+      </CardHeader>
+      <CardContent className="p-5 flex-grow">
+        <CardTitle className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">{car.name}</CardTitle>
+        <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm text-muted-foreground mb-4">
+          <div className="flex items-center gap-2">
+            <Users className="h-4 w-4 text-primary" />
+            <span>{car.seats || "N/A"} Seats</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Fuel className="h-4 w-4 text-primary" />
+            <span>{car.fuel_type || "N/A"}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Cog className="h-4 w-4 text-primary" />
+            <span>{car.transmission || "N/A"}</span>
+          </div>
+        </div>
+      </CardContent>
+      <CardFooter className="p-5 bg-gray-50 dark:bg-gray-800/50 border-t dark:border-gray-700/50 flex items-center justify-between">
+        <div>
+          <p className="text-2xl font-bold text-primary">
+            ${car.price_per_day}
+            <span className="text-sm font-normal text-muted-foreground">/day</span>
+          </p>
+        </div>
+        <Button asChild size="default" className="text-base font-semibold">
+          <Link href={`/cars/${car.id}`}>Book Now</Link>
+        </Button>
+      </CardFooter>
+    </Card>
+  );
+} 

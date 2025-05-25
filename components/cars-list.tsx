@@ -15,12 +15,29 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { AddCarModal } from "@/components/add-car-modal"
 import { EditCarModal } from "@/components/edit-car-modal"
-import { CarRowSkeleton } from "@/components/car-row-skeleton"
+import { CarCard, Car as CarCardType } from "@/components/car-card"
+import { CarCardSkeleton } from "@/components/car-card-skeleton"
+import { CarDetailsModal } from "@/components/car-details-modal"
 import { getCars, addCar, updateCar, deleteCar } from "@/lib/actions"
 import { useToast } from "@/components/ui/use-toast"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination"
 
 // Define the Car type based on database schema and form usage
 interface Car {
@@ -65,7 +82,16 @@ export function CarsList() {
   const [loading, setLoading] = useState(true)
   const [editingCar, setEditingCar] = useState<CarFormData | null>(null)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [viewingCar, setViewingCar] = useState<CarCardType | null>(null)
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false)
   const { toast } = useToast()
+
+  const [selectedMake, setSelectedMake] = useState<string | null>(null)
+  const [selectedModel, setSelectedModel] = useState<string | null>(null)
+  const [selectedYear, setSelectedYear] = useState<number | null>(null)
+  const [selectedStatus, setSelectedStatus] = useState<string | null>(null)
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 12; // 3 rows on xl:grid-cols-4
 
   useEffect(() => {
     async function loadCars() {
@@ -87,12 +113,24 @@ export function CarsList() {
     loadCars()
   }, [toast])
 
-  const filteredCars = cars.filter(
-    (car) =>
+  const filteredCars = cars.filter((car) => {
+    const matchesSearchTerm =
       car.make.toLowerCase().includes(searchTerm.toLowerCase()) ||
       car.model.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (car.license_plate && car.license_plate.toLowerCase().includes(searchTerm.toLowerCase())),
-  )
+      (car.license_plate && car.license_plate.toLowerCase().includes(searchTerm.toLowerCase()));
+
+    const matchesMake = selectedMake ? car.make === selectedMake : true;
+    const matchesModel = selectedModel ? car.model === selectedModel : true;
+    const matchesYear = selectedYear ? car.year === selectedYear : true;
+    const matchesStatus = selectedStatus ? car.status === selectedStatus : true;
+
+    return matchesSearchTerm && matchesMake && matchesModel && matchesYear && matchesStatus;
+  });
+
+  const uniqueMakes = Array.from(new Set(cars.map((car) => car.make)));
+  const uniqueModels = Array.from(new Set(cars.map((car) => car.model)));
+  const uniqueYears = Array.from(new Set(cars.map((car) => car.year.toString()))).map(Number).sort((a, b) => b - a);
+  const uniqueStatuses = Array.from(new Set(cars.map((car) => car.status)));
 
   const handleAddCar = async (newCarData: CarFormData): Promise<ServerActionResult> => {
     const carToAdd = {
@@ -142,21 +180,20 @@ export function CarsList() {
     }
   }
 
-  const handleEditCar = (car: Car) => {
+  const handleEditCar = (carToEdit: CarCardType) => {
     const transformedCar: CarFormData = {
-      id: car.id,
-      make: car.make,
-      model: car.model,
-      year: car.year,
-      category: car.category,
-      color: car.color,
-      licensePlate: car.license_plate,
-      status: car.status,
-      dailyRate: car.daily_rate,
-      images: car.images || [],
-      primaryImage: car.primary_image,
+      id: carToEdit.id,
+      make: carToEdit.make,
+      model: carToEdit.model,
+      year: carToEdit.year,
+      category: carToEdit.category,
+      color: carToEdit.color,
+      licensePlate: carToEdit.license_plate,
+      status: carToEdit.status,
+      dailyRate: carToEdit.daily_rate,
+      images: carToEdit.images || [],
+      primaryImage: carToEdit.primary_image,
     }
-
     setEditingCar(transformedCar)
     setIsEditModalOpen(true)
   }
@@ -222,6 +259,15 @@ export function CarsList() {
           title: "Success",
           description: "Car deleted successfully",
         });
+        if (result.imageDeletionError) {
+          console.warn("[handleDeleteCar] Image deletion issue:", result.imageDeletionError);
+          toast({
+            title: "Image Deletion Warning",
+            description: result.imageDeletionError,
+            variant: "default", // Or another appropriate variant like warning if available
+            duration: 5000, 
+          });
+        }
       } else {
         console.error("Failed to delete car (from server action):", result.error);
         console.log("[handleDeleteCar] TOASTING: Error -", result.error);
@@ -242,124 +288,223 @@ export function CarsList() {
     }
   }
 
+  const handleViewCarDetails = (car: CarCardType) => {
+    setViewingCar(car);
+    setIsViewModalOpen(true);
+  };
+
+  const handleResetFilters = () => {
+    setSearchTerm("");
+    setSelectedMake(null);
+    setSelectedModel(null);
+    setSelectedYear(null);
+    setSelectedStatus(null);
+    setCurrentPage(1); // Reset to first page on filter reset
+  };
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredCars.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentCars = filteredCars.slice(startIndex, endIndex);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo(0, 0); // Scroll to top of page on page change
+  };
+
+  const getPaginationItems = () => {
+    const paginationItems = [];
+    const maxPagesToShow = 5; // Max number of page links to show (e.g., 1 ... 3 4 5 ... 10)
+    const halfMaxPages = Math.floor(maxPagesToShow / 2);
+
+    if (totalPages <= maxPagesToShow) {
+      for (let i = 1; i <= totalPages; i++) {
+        paginationItems.push(
+          <PaginationItem key={i}>
+            <PaginationLink href="#" onClick={(e) => { e.preventDefault(); handlePageChange(i); }} isActive={currentPage === i}>
+              {i}
+            </PaginationLink>
+          </PaginationItem>
+        );
+      }
+    } else {
+      // Show first page
+      paginationItems.push(
+        <PaginationItem key={1}>
+          <PaginationLink href="#" onClick={(e) => { e.preventDefault(); handlePageChange(1); }} isActive={currentPage === 1}>
+            1
+          </PaginationLink>
+        </PaginationItem>
+      );
+
+      let startPage = Math.max(2, currentPage - halfMaxPages + (currentPage + halfMaxPages > totalPages ? totalPages - currentPage - halfMaxPages +1: 0) );
+      let endPage = Math.min(totalPages - 1, currentPage + halfMaxPages - (currentPage <= halfMaxPages ? halfMaxPages - currentPage +1 : 0) );
+      
+      if (currentPage - 1 > halfMaxPages && totalPages > maxPagesToShow-1 ){
+          if(startPage > 2) paginationItems.push(<PaginationItem key="start-ellipsis"><PaginationEllipsis /></PaginationItem>);
+      }
+
+      for (let i = startPage; i <= endPage; i++) {
+        paginationItems.push(
+          <PaginationItem key={i}>
+            <PaginationLink href="#" onClick={(e) => { e.preventDefault(); handlePageChange(i); }} isActive={currentPage === i}>
+              {i}
+            </PaginationLink>
+          </PaginationItem>
+        );
+      }
+
+      if (totalPages - currentPage > halfMaxPages && totalPages > maxPagesToShow -1 ){
+          if(endPage < totalPages -1) paginationItems.push(<PaginationItem key="end-ellipsis"><PaginationEllipsis /></PaginationItem>);
+      }
+      // Show last page
+      paginationItems.push(
+        <PaginationItem key={totalPages}>
+          <PaginationLink href="#" onClick={(e) => { e.preventDefault(); handlePageChange(totalPages); }} isActive={currentPage === totalPages}>
+            {totalPages}
+          </PaginationLink>
+        </PaginationItem>
+      );
+    }
+    return paginationItems;
+  };
+
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
-            <CardTitle className="text-xl">Cars Fleet</CardTitle>
-            <CardDescription>Manage your rental vehicles</CardDescription>
+            <CardTitle className="text-2xl font-bold tracking-tight">Cars Fleet</CardTitle>
+            <CardDescription>Manage your rental vehicles. View details, edit, or add new cars.</CardDescription>
           </div>
           <AddCarModal onAddCar={handleAddCar} />
         </div>
+        <div className="mt-6 flex flex-col space-y-4 md:flex-row md:justify-between md:items-center md:space-y-0">
+          <div className="w-full md:w-1/3">
+            <Input
+              placeholder="Search by make, model, or license plate..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="max-w-sm"
+            />
+          </div>
+          <div className="flex flex-wrap items-center gap-2 md:gap-4">
+            <Select value={selectedMake || ""} onValueChange={(value) => setSelectedMake(value === "all" ? null : value)}>
+              <SelectTrigger className={`w-full md:w-[160px] ${selectedMake ? 'bg-blue-100 dark:bg-blue-900' : ''}`}>
+                <SelectValue placeholder="Filter by Make" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Makes</SelectItem>
+                {uniqueMakes.map((make) => (
+                  <SelectItem key={make} value={make}>
+                    {make}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select value={selectedModel || ""} onValueChange={(value) => setSelectedModel(value === "all" ? null : value)} disabled={!selectedMake && uniqueModels.length === 0}>
+              <SelectTrigger className={`w-full md:w-[160px] ${selectedModel ? 'bg-blue-100 dark:bg-blue-900' : ''}`}>
+                <SelectValue placeholder="Filter by Model" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Models</SelectItem>
+                {uniqueModels
+                  .filter(model => !selectedMake || cars.find(car => car.make === selectedMake && car.model === model))
+                  .map((model) => (
+                  <SelectItem key={model} value={model}>
+                    {model}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select value={selectedYear?.toString() || ""} onValueChange={(value) => setSelectedYear(value === "all" ? null : parseInt(value))}>
+              <SelectTrigger className={`w-full md:w-[120px] ${selectedYear ? 'bg-blue-100 dark:bg-blue-900' : ''}`}>
+                <SelectValue placeholder="Filter by Year" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Years</SelectItem>
+                {uniqueYears.map((year) => (
+                  <SelectItem key={year} value={year.toString()}>
+                    {year}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select value={selectedStatus || ""} onValueChange={(value) => setSelectedStatus(value === "all" ? null : value)}>
+              <SelectTrigger className={`w-full md:w-[150px] ${selectedStatus ? 'bg-blue-100 dark:bg-blue-900' : ''}`}>
+                <SelectValue placeholder="Filter by Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Statuses</SelectItem>
+                {uniqueStatuses.map((status) => (
+                  <SelectItem key={status} value={status}>
+                    {status}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button onClick={handleResetFilters} variant="outline">Reset Filters</Button>
+          </div>
+        </div>
       </CardHeader>
-      <CardContent>
-        <div className="flex items-center py-4">
-          <Input
-            placeholder="Search cars..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="max-w-sm"
-          />
-        </div>
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Image</TableHead>
-                <TableHead>ID</TableHead>
-                <TableHead>Make & Model</TableHead>
-                <TableHead>Year</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>License Plate</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Daily Rate</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {loading ? (
-                Array.from({ length: 5 }).map((_, index) => (
-                  <CarRowSkeleton key={index} />
-                ))
-              ) : filteredCars.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={9} className="text-center py-10">
-                    No cars found
-                  </TableCell>
-                </TableRow>
-              ) : (
-                filteredCars.map((car) => (
-                  <TableRow key={car.id}>
-                    <TableCell>
-                      <div className="relative h-12 w-16 overflow-hidden rounded-md">
-                        {car.primary_image ? (
-                          <Image
-                            src={car.primary_image || "/placeholder.svg"}
-                            alt={`${car.make} ${car.model}`}
-                            fill
-                            className="object-cover"
-                          />
-                        ) : (
-                          <div className="flex h-full w-full items-center justify-center bg-muted">
-                            <CarIconLucide className="h-6 w-6 text-muted-foreground" />
-                          </div>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell className="font-medium">CAR-{car.id.toString().padStart(3, "0")}</TableCell>
-                    <TableCell>
-                      <div className="flex items-center">
-                        <span>{`${car.make} ${car.model}`}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>{car.year}</TableCell>
-                    <TableCell>{car.category}</TableCell>
-                    <TableCell>{car.license_plate}</TableCell>
-                    <TableCell>
-                      {(() => {
-                        let badgeVariant: "default" | "secondary" | "destructive" | "outline" | null | undefined;
-                        if (car.status === "Available") {
-                          badgeVariant = "secondary";
-                        } else if (car.status === "Rented") {
-                          badgeVariant = "default";
-                        } else {
-                          badgeVariant = "destructive";
-                        }
-                        return (
-                          <Badge variant={badgeVariant}>
-                            {car.status}
-                          </Badge>
-                        );
-                      })()}
-                    </TableCell>
-                    <TableCell>${car.daily_rate}/day</TableCell>
-                    <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          <DropdownMenuItem onClick={() => handleEditCar(car)}>
-                            <Edit className="mr-2 h-4 w-4" /> Edit details
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem className="text-destructive" onClick={() => handleDeleteCar(car.id)}>
-                            <Trash className="mr-2 h-4 w-4" /> Delete car
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </div>
+      <CardContent className="pt-0">
+        {loading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 py-6">
+            {Array.from({ length: itemsPerPage }).map((_, index) => (
+              <CarCardSkeleton key={index} />
+            ))}
+          </div>
+        ) : filteredCars.length === 0 ? (
+          <div className="text-center py-20">
+            <CarIconLucide className="mx-auto h-16 w-16 text-muted-foreground mb-4" />
+            <h3 className="text-xl font-semibold mb-2">No Cars Found</h3>
+            <p className="text-muted-foreground">
+              {searchTerm 
+                ? `No cars match your search for "${searchTerm}". Try a different term.`
+                : "There are no cars in the fleet yet. Click 'Add Car' to get started!"}
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 py-6">
+            {currentCars.map((car) => (
+              <div key={car.id} className="cursor-pointer">
+                <CarCard
+                  car={car}
+                  onEdit={() => handleEditCar(car)}
+                  onDelete={() => handleDeleteCar(car.id)}
+                  onPreview={() => handleViewCarDetails(car)}
+                />
+              </div>
+            ))}
+          </div>
+        )}
+        {!loading && filteredCars.length > itemsPerPage && (
+          <div className="mt-8 flex justify-center">
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious
+                    href="#"
+                    onClick={(e) => { e.preventDefault(); if (currentPage > 1) handlePageChange(currentPage - 1); }}
+                    className={currentPage === 1 ? "pointer-events-none opacity-50" : undefined}
+                  />
+                </PaginationItem>
+                {getPaginationItems()}
+                <PaginationItem>
+                  <PaginationNext
+                    href="#"
+                    onClick={(e) => { e.preventDefault(); if (currentPage < totalPages) handlePageChange(currentPage + 1); }}
+                    className={currentPage === totalPages ? "pointer-events-none opacity-50" : undefined}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
+        )}
       </CardContent>
 
       {editingCar && (
@@ -368,6 +513,22 @@ export function CarsList() {
           open={isEditModalOpen}
           onOpenChange={setIsEditModalOpen}
           onUpdateCar={handleUpdateCar}
+        />
+      )}
+
+      {viewingCar && (
+        <CarDetailsModal
+          car={viewingCar}
+          open={isViewModalOpen}
+          onOpenChange={setIsViewModalOpen}
+          onEdit={() => {
+            setIsViewModalOpen(false);
+            handleEditCar(viewingCar);
+          }}
+          onDelete={() => {
+            setIsViewModalOpen(false);
+            handleDeleteCar(viewingCar.id);
+          }}
         />
       )}
     </Card>

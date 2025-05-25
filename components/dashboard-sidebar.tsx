@@ -1,8 +1,9 @@
 "use client"
 
-import { Car, CalendarClock, Users, LayoutDashboard, Settings, LogOut, Search, MessageCircle } from "lucide-react"
+import { Car, CalendarClock, Users, LayoutDashboard, Settings, LogOut, Search, MessageCircle, PanelLeft } from "lucide-react"
 import { usePathname, useRouter } from "next/navigation"
 import type { User } from "@supabase/supabase-js"
+import React from "react"
 
 import {
   Sidebar,
@@ -16,6 +17,8 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarRail,
+  SidebarProvider,
+  useSidebar
 } from "@/components/ui/sidebar"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
@@ -28,10 +31,11 @@ interface DashboardSidebarProps {
   user: User
 }
 
-export function DashboardSidebar({ user }: DashboardSidebarProps) {
+function DashboardSidebarContent({ user }: DashboardSidebarProps) {
   const pathname = usePathname()
   const router = useRouter()
   const { signOut } = useAuth()
+  const { setOpen, open } = useSidebar()
 
   const routes = [
     {
@@ -77,14 +81,18 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
     router.refresh()
   }
 
-  // Get user initials for avatar fallback
   const getUserInitials = () => {
     if (!user || !user.email) return "U"
     return user.email.substring(0, 2).toUpperCase()
   }
 
   return (
-    <Sidebar collapsible="icon">
+    <Sidebar 
+      collapsible="icon" 
+      className="sidebar-component"
+      onMouseEnter={() => setOpen(true)}
+      onMouseLeave={() => setOpen(false)}
+    >
       <SidebarHeader>
         <div className="flex items-center gap-2 px-4 py-2">
           <Car className="h-6 w-6" />
@@ -141,6 +149,21 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
         </div>
       </SidebarFooter>
       <SidebarRail />
+      <style jsx global>{`
+        .sidebar-component button[aria-label*="sidebar"][title*="sidebar"] {
+          display: none !important;
+        }
+      `}</style>
     </Sidebar>
+  )
+}
+
+export function DashboardSidebar({ user }: DashboardSidebarProps) {
+  const [isOpen, setIsOpen] = React.useState(true);
+
+  return (
+    <SidebarProvider defaultOpen={true} open={isOpen} onOpenChange={setIsOpen}>
+      <DashboardSidebarContent user={user} />
+    </SidebarProvider>
   )
 }

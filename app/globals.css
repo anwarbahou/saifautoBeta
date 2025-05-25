@@ -85,6 +85,15 @@
 }
 
 /* Custom badge variants */
-.badge-success {
-  @apply bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-800 dark:text-green-100 dark:hover:bg-green-700;
+
+/* Add these styles to hide scrollbars */
+html,
+body {
+  scrollbar-width: none; /* For Firefox */
+  -ms-overflow-style: none;  /* For Internet Explorer and Edge */
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none; /* For Chrome, Safari, and Opera */
 }

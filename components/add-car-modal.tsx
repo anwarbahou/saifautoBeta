@@ -7,15 +7,8 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Plus } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
+import { ResponsiveDialogOrDrawer } from "@/components/ui/ResponsiveDialogOrDrawer"
+// import { DialogTrigger } from "@/components/ui/dialog" // No longer needed
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -73,17 +66,21 @@ export function AddCarModal({ onAddCar }: AddCarModalProps) {
   async function onSubmit(values: FormValues) {
     setIsSubmitting(true)
     let finalImageUrls = [...images];
+    let currentPrimaryIndex = primaryImageIndex;
 
     try {
       if (imageUploadRef.current && imageUploadRef.current.getPendingFilesCount() > 0) {
-        console.log("[AddCarModal] Found pending files. Triggering upload...");
         const newUploadedUrls = await imageUploadRef.current.uploadPendingFilesAndGetUrls();
         if (newUploadedUrls.length > 0) {
           finalImageUrls = [...finalImageUrls, ...newUploadedUrls];
           setImages(finalImageUrls);
-          imageUploadRef.current.clearPendingFiles();
         }
-        console.log("[AddCarModal] Pending files processed. New URLs:", newUploadedUrls);
+        imageUploadRef.current.clearPendingFiles();
+      }
+
+      if (currentPrimaryIndex === -1 && finalImageUrls.length > 0) {
+        currentPrimaryIndex = 0;
+        setPrimaryImageIndex(0);
       }
 
       const newCar = {
@@ -96,15 +93,12 @@ export function AddCarModal({ onAddCar }: AddCarModalProps) {
         status: values.status,
         dailyRate: Number.parseFloat(values.dailyRate),
         images: finalImageUrls,
-        primaryImage: primaryImageIndex >= 0 && finalImageUrls[primaryImageIndex] ? finalImageUrls[primaryImageIndex] : null,
+        primaryImage: currentPrimaryIndex >= 0 && finalImageUrls[currentPrimaryIndex] ? finalImageUrls[currentPrimaryIndex] : null,
       }
 
-      console.log("[AddCarModal] Calling onAddCar with:", newCar);
       const result = await onAddCar(newCar);
-      console.log("[AddCarModal] Received result from onAddCar:", result);
 
       if (result && result.success) {
-        console.log("[AddCarModal] onAddCar was successful. Resetting form.");
         form.reset({
           make: "",
           model: "",
@@ -120,9 +114,7 @@ export function AddCarModal({ onAddCar }: AddCarModalProps) {
         setActiveTab("details")
         setOpen(false)
       } else {
-        console.log("[AddCarModal] onAddCar reported an error or no success. Result:", result);
         const errorMessage = result?.error || "An unexpected error occurred while adding the car. Please try again."
-        console.log("[AddCarModal TOASTING FOR ERROR] Message:", errorMessage);
         toast({
           title: "Error Adding Car",
           description: errorMessage,
@@ -131,7 +123,6 @@ export function AddCarModal({ onAddCar }: AddCarModalProps) {
       }
 
     } catch (error: any) {
-      console.error("[AddCarModal] UNEXPECTED error caught in onSubmit try/catch block:", error);
       const errorMessage = error?.message || "An unexpected client-side error occurred. Please try again."
       toast({
         title: "Critical Client Error",
@@ -162,29 +153,41 @@ export function AddCarModal({ onAddCar }: AddCarModalProps) {
     }
   }
 
-  return (
-    <Dialog
-      open={open}
-      onOpenChange={(newOpen) => {
-        if (!isSubmitting) {
-          setOpen(newOpen)
-          if (!newOpen) {
-            handleClose()
-          }
-        }
-      }}
-    >
-      <DialogTrigger asChild>
-        <Button>
-          <Plus className="mr-2 h-4 w-4" /> Add Car
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px]">
-        <DialogHeader>
-          <DialogTitle>Add New Car</DialogTitle>
-          <DialogDescription>Enter the details of the new car to add to your fleet.</DialogDescription>
-        </DialogHeader>
+  const dialogTitle = "Add New Car";
+  const dialogDescription = "Enter the details of the new car to add to your fleet.";
 
+  const dialogFooter = (
+    <>
+      <Button type="button" variant="outline" onClick={handleClose} disabled={isSubmitting}>
+        Cancel
+      </Button>
+      <Button type="submit" form="add-car-form" disabled={isSubmitting}>
+        {isSubmitting ? "Adding..." : "Add Car"}
+      </Button>
+    </>
+  );
+
+  return (
+    <>
+      <Button onClick={() => setOpen(true)}>
+        <Plus className="mr-2 h-4 w-4" /> Add Car
+      </Button>
+
+      <ResponsiveDialogOrDrawer
+        open={open}
+        onOpenChange={(newOpen) => {
+          if (!isSubmitting) {
+            setOpen(newOpen)
+            if (!newOpen) {
+              handleClose()
+            }
+          }
+        }}
+        title={dialogTitle}
+        description={dialogDescription}
+        footer={dialogFooter}
+        className="sm:max-w-[600px]"
+      >
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="details">Car Details</TabsTrigger>
@@ -192,7 +195,7 @@ export function AddCarModal({ onAddCar }: AddCarModalProps) {
           </TabsList>
 
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
+            <form id="add-car-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
               <TabsContent value="details" className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
@@ -348,19 +351,10 @@ export function AddCarModal({ onAddCar }: AddCarModalProps) {
                   />
                 </div>
               </TabsContent>
-
-              <DialogFooter>
-                <Button type="button" variant="outline" onClick={handleClose} disabled={isSubmitting}>
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? "Adding..." : "Add Car"}
-                </Button>
-              </DialogFooter>
             </form>
           </Form>
         </Tabs>
-      </DialogContent>
-    </Dialog>
+      </ResponsiveDialogOrDrawer>
+    </>
   )
 }

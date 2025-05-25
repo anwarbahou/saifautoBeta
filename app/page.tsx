@@ -1,11 +1,11 @@
-import React from 'react'
+import { Suspense } from 'react';
+import LandingPlaceholder from './LandingPage'; // Assuming LandingPage.tsx is in the same app directory
 
-const LandingPlaceholder = () => (
-  <main className="flex min-h-screen items-center justify-center bg-gray-50">
-    <h1 className="text-5xl font-extrabold text-gray-800 text-center" tabIndex={0} aria-label="Landing Page Placeholder">
-      Landing Page Placeholder
-    </h1>
-  </main>
-)
-
-export default LandingPlaceholder 
+export default async function Page() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      {/* @ts-expect-error Server Component */}
+      <LandingPlaceholder />
+    </Suspense>
+  );
+} 
