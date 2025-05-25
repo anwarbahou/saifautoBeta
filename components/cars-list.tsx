@@ -1,11 +1,11 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback, useMemo } from "react"
 import { Car as CarIconLucide, Edit, MoreHorizontal, Trash } from "lucide-react"
 import Image from "next/image"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -78,7 +78,8 @@ interface ServerActionResult {
 
 export function CarsList() {
   const [searchTerm, setSearchTerm] = useState("")
-  const [cars, setCars] = useState<Car[]>([])
+  const [allFetchedCars, setAllFetchedCars] = useState<Car[]>([]) // To store all cars if needed for filter dropdowns
+  const [displayedCars, setDisplayedCars] = useState<Car[]>([]) // Cars for the current page
   const [loading, setLoading] = useState(true)
   const [editingCar, setEditingCar] = useState<CarFormData | null>(null)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
@@ -91,46 +92,83 @@ export function CarsList() {
   const [selectedYear, setSelectedYear] = useState<number | null>(null)
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null)
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 12; // 3 rows on xl:grid-cols-4
+  const [totalPages, setTotalPages] = useState(1);
+  const itemsPerPage = 12;
 
+  // Fetches cars for the current page
+  const loadPaginatedCars = useCallback(async (page: number) => {
+    setLoading(true);
+    try {
+      const { data, count, error } = await getCars(page, itemsPerPage);
+      if (error) {
+        throw new Error(error);
+      }
+      setDisplayedCars(data); // Set current page's cars
+      setTotalPages(Math.ceil((count || 0) / itemsPerPage));
+      // If allFetchedCars is meant to populate filter dropdowns with *all* possible options,
+      // it would need a separate fetch or a different strategy. For now, it's not being updated here.
+    } catch (error: any) {
+      console.error("Failed to load cars:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to load cars. See console for details.",
+        variant: "destructive",
+      });
+      setDisplayedCars([]);
+      setTotalPages(1);
+    } finally {
+      setLoading(false);
+    }
+  }, [toast, itemsPerPage]);
+
+  // Initial load and when currentPage changes
   useEffect(() => {
-    async function loadCars() {
+    loadPaginatedCars(currentPage);
+  }, [currentPage, loadPaginatedCars]);
+  
+  // Effect to load all cars once for filter dropdowns (if this is the desired strategy)
+  useEffect(() => {
+    async function loadAllCarsForFilters() {
       try {
-        const data: Car[] = await getCars()
-        setCars(data)
-      } catch (error) {
-        console.error("Failed to load cars:", error);
-        toast({
-          title: "Error",
-          description: "Failed to load cars. See console for details.",
-          variant: "destructive",
-        })
-      } finally {
-        setLoading(false)
+        // This fetches ALL cars. If this is too much, an alternative strategy for filters is needed.
+        const { data, error } = await getCars(1, 10000); // Fetch a large number for filters
+        if (error) throw new Error(error);
+        setAllFetchedCars(data);
+      } catch (error:any) {
+        console.error("Failed to load all cars for filters:", error);
+        // Potentially toast or handle this error for filter population
       }
     }
+    loadAllCarsForFilters();
+  }, []);
 
-    loadCars()
-  }, [toast])
+  const filteredCars = useMemo(() => {
+    // This now filters only the `displayedCars` (current page data)
+    return displayedCars.filter((car) => {
+      const matchesSearchTerm =
+        car.make.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        car.model.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (car.license_plate && car.license_plate.toLowerCase().includes(searchTerm.toLowerCase()));
 
-  const filteredCars = cars.filter((car) => {
-    const matchesSearchTerm =
-      car.make.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      car.model.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (car.license_plate && car.license_plate.toLowerCase().includes(searchTerm.toLowerCase()));
+      const matchesMake = selectedMake ? car.make === selectedMake : true;
+      const matchesModel = selectedModel ? car.model === selectedModel : true;
+      const matchesYear = selectedYear ? car.year === selectedYear : true;
+      const matchesStatus = selectedStatus ? car.status === selectedStatus : true;
 
-    const matchesMake = selectedMake ? car.make === selectedMake : true;
-    const matchesModel = selectedModel ? car.model === selectedModel : true;
-    const matchesYear = selectedYear ? car.year === selectedYear : true;
-    const matchesStatus = selectedStatus ? car.status === selectedStatus : true;
-
-    return matchesSearchTerm && matchesMake && matchesModel && matchesYear && matchesStatus;
-  });
-
-  const uniqueMakes = Array.from(new Set(cars.map((car) => car.make)));
-  const uniqueModels = Array.from(new Set(cars.map((car) => car.model)));
-  const uniqueYears = Array.from(new Set(cars.map((car) => car.year.toString()))).map(Number).sort((a, b) => b - a);
-  const uniqueStatuses = Array.from(new Set(cars.map((car) => car.status)));
+      return matchesSearchTerm && matchesMake && matchesModel && matchesYear && matchesStatus;
+    });
+  }, [displayedCars, searchTerm, selectedMake, selectedModel, selectedYear, selectedStatus]);
+  
+  const uniqueMakes = useMemo(() => Array.from(new Set(allFetchedCars.map((car) => car.make))), [allFetchedCars]);
+  const uniqueModels = useMemo(() => {
+    let models = allFetchedCars;
+    if (selectedMake) {
+      models = models.filter(car => car.make === selectedMake);
+    }
+    return Array.from(new Set(models.map((car) => car.model)));
+  }, [allFetchedCars, selectedMake]);
+  const uniqueYears = useMemo(() => Array.from(new Set(allFetchedCars.map((car) => car.year.toString()))).map(Number).sort((a, b) => b - a), [allFetchedCars]);
+  const uniqueStatuses = useMemo(() => Array.from(new Set(allFetchedCars.map((car) => car.status))), [allFetchedCars]);
 
   const handleAddCar = async (newCarData: CarFormData): Promise<ServerActionResult> => {
     const carToAdd = {
@@ -154,21 +192,10 @@ export function CarsList() {
 
     if (result.data) {
       const newCarFromResponse = result.data as any;
-      const formattedNewCar: Car = {
-        id: newCarFromResponse.id,
-        make: newCarFromResponse.make,
-        model: newCarFromResponse.model,
-        year: newCarFromResponse.year,
-        category: newCarFromResponse.category,
-        color: newCarFromResponse.color,
-        license_plate: newCarFromResponse.license_plate,
-        status: newCarFromResponse.status,
-        daily_rate: newCarFromResponse.daily_rate,
-        images: newCarFromResponse.images || [],
-        primary_image: newCarFromResponse.primary_image || null,
-      };
-
-      setCars((prevCars) => [...prevCars, formattedNewCar]);
+      // Add to displayedCars if on the first page (or handle differently)
+      // Also update allFetchedCars for filters
+      loadPaginatedCars(currentPage); // Refresh current page
+      setAllFetchedCars(prev => [newCarFromResponse, ...prev]); // Add to master list for filters
       toast({
         title: "Success",
         description: "Car added successfully",
@@ -220,21 +247,8 @@ export function CarsList() {
     }
 
     if (result.data) {
-      const updatedCarFromResponse = result.data as any;
-      const formattedUpdatedCar: Car = {
-          id: updatedCarFromResponse.id,
-          make: updatedCarFromResponse.make,
-          model: updatedCarFromResponse.model,
-          year: updatedCarFromResponse.year,
-          category: updatedCarFromResponse.category,
-          color: updatedCarFromResponse.color,
-          license_plate: updatedCarFromResponse.license_plate,
-          status: updatedCarFromResponse.status,
-          daily_rate: updatedCarFromResponse.daily_rate,
-          images: updatedCarFromResponse.images || [],
-          primary_image: updatedCarFromResponse.primary_image || null,
-      };
-      setCars((prevCars) => prevCars.map((c) => (c.id === formattedUpdatedCar.id ? formattedUpdatedCar : c)))
+      loadPaginatedCars(currentPage); // Refresh current page
+      setAllFetchedCars(prev => prev.map(c => c.id === result.data.id ? result.data : c)); // Update in master list
       toast({
         title: "Success",
         description: "Car updated successfully",
@@ -247,46 +261,22 @@ export function CarsList() {
   }
 
   const handleDeleteCar = async (carId: number) => {
-    console.log("[handleDeleteCar] Attempting to delete car ID:", carId);
-    try {
-      const result = await deleteCar(carId);
-      console.log("[handleDeleteCar] Result from server action:", result);
-
-      if (result.success) {
-        setCars((prevCars) => prevCars.filter((car) => car.id !== carId))
-        console.log("[handleDeleteCar] TOASTING: Success - Car deleted successfully");
-        toast({
-          title: "Success",
-          description: "Car deleted successfully",
-        });
-        if (result.imageDeletionError) {
-          console.warn("[handleDeleteCar] Image deletion issue:", result.imageDeletionError);
-          toast({
-            title: "Image Deletion Warning",
-            description: result.imageDeletionError,
-            variant: "default", // Or another appropriate variant like warning if available
-            duration: 5000, 
-          });
-        }
-      } else {
-        console.error("Failed to delete car (from server action):", result.error);
-        console.log("[handleDeleteCar] TOASTING: Error -", result.error);
-        toast({
-          title: "Error Deleting Car",
-          description: result.error || "An unknown error occurred.",
-          variant: "destructive",
-        });
-      }
-    } catch (error: any) {
-      console.error("Unexpected error in handleDeleteCar:", error);
-      console.log("[handleDeleteCar] TOASTING: Fallback Error - Unexpected client-side issue");
+    const result = await deleteCar(carId);
+    if (result.success) {
+      toast({
+        title: "Success",
+        description: "Car deleted successfully." + (result.imageDeletionError ? ` Warning: ${result.imageDeletionError}` : ""),
+      });
+      loadPaginatedCars(currentPage); // Corrected: Refresh current page using the renamed function
+      setAllFetchedCars(prev => prev.filter(c => c.id !== carId)); // Remove from master list
+    } else {
       toast({
         title: "Error",
-        description: "Failed to delete car due to an unexpected client-side issue. Please try again.",
+        description: result.error || "Failed to delete car. An unknown error occurred.",
         variant: "destructive",
-      })
+      });
     }
-  }
+  };
 
   const handleViewCarDetails = (car: CarCardType) => {
     setViewingCar(car);
@@ -299,19 +289,18 @@ export function CarsList() {
     setSelectedModel(null);
     setSelectedYear(null);
     setSelectedStatus(null);
-    setCurrentPage(1); // Reset to first page on filter reset
+    setCurrentPage(1); // Reset to page 1 when filters are reset
+    // loadCars(1); // Fetch data for page 1 with cleared filters (if filters were server-side)
   };
-
-  // Pagination logic
-  const totalPages = Math.ceil(filteredCars.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentCars = filteredCars.slice(startIndex, endIndex);
 
   const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-    window.scrollTo(0, 0); // Scroll to top of page on page change
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
   };
+
+  // Current cars to render are now directly from filteredCars as pagination is handled by API
+  // const currentCars = filteredCars; // No longer slicing client-side
 
   const getPaginationItems = () => {
     const paginationItems = [];
@@ -411,7 +400,7 @@ export function CarsList() {
               <SelectContent>
                 <SelectItem value="all">All Models</SelectItem>
                 {uniqueModels
-                  .filter(model => !selectedMake || cars.find(car => car.make === selectedMake && car.model === model))
+                  .filter(model => !selectedMake || allFetchedCars.find(car => car.make === selectedMake && car.model === model))
                   .map((model) => (
                   <SelectItem key={model} value={model}>
                     {model}
@@ -470,7 +459,7 @@ export function CarsList() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 py-6">
-            {currentCars.map((car) => (
+            {filteredCars.map((car) => (
               <div key={car.id} className="cursor-pointer">
                 <CarCard
                   car={car}
@@ -487,50 +476,34 @@ export function CarsList() {
             <Pagination>
               <PaginationContent>
                 <PaginationItem>
-                  <PaginationPrevious
-                    href="#"
-                    onClick={(e) => { e.preventDefault(); if (currentPage > 1) handlePageChange(currentPage - 1); }}
-                    className={currentPage === 1 ? "pointer-events-none opacity-50" : undefined}
-                  />
+                  <PaginationPrevious href="#" onClick={(e) => { e.preventDefault(); handlePageChange(currentPage - 1); }} aria-disabled={currentPage <= 1} className={currentPage <= 1 ? "pointer-events-none opacity-50" : undefined} />
                 </PaginationItem>
                 {getPaginationItems()}
                 <PaginationItem>
-                  <PaginationNext
-                    href="#"
-                    onClick={(e) => { e.preventDefault(); if (currentPage < totalPages) handlePageChange(currentPage + 1); }}
-                    className={currentPage === totalPages ? "pointer-events-none opacity-50" : undefined}
-                  />
+                  <PaginationNext href="#" onClick={(e) => { e.preventDefault(); handlePageChange(currentPage + 1); }} aria-disabled={currentPage >= totalPages} className={currentPage >= totalPages ? "pointer-events-none opacity-50" : undefined} />
                 </PaginationItem>
               </PaginationContent>
             </Pagination>
           </div>
         )}
       </CardContent>
-
-      {editingCar && (
-        <EditCarModal
-          car={editingCar}
-          open={isEditModalOpen}
-          onOpenChange={setIsEditModalOpen}
-          onUpdateCar={handleUpdateCar}
-        />
-      )}
-
-      {viewingCar && (
-        <CarDetailsModal
-          car={viewingCar}
-          open={isViewModalOpen}
-          onOpenChange={setIsViewModalOpen}
-          onEdit={() => {
-            setIsViewModalOpen(false);
-            handleEditCar(viewingCar);
-          }}
-          onDelete={() => {
-            setIsViewModalOpen(false);
-            handleDeleteCar(viewingCar.id);
-          }}
-        />
-      )}
+      <CardFooter>
+        {editingCar && (
+          <EditCarModal
+            car={editingCar}
+            open={isEditModalOpen}
+            onOpenChange={setIsEditModalOpen}
+            onUpdateCar={handleUpdateCar}
+          />
+        )}
+        {viewingCar && (
+          <CarDetailsModal
+            car={viewingCar}
+            open={isViewModalOpen}
+            onOpenChange={setIsViewModalOpen}
+          />
+        )}
+      </CardFooter>
     </Card>
   )
 }

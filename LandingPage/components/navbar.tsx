@@ -45,9 +45,9 @@ export default function Navbar() {
         </nav>
 
         <div className="hidden md:flex items-center gap-4">
-          <Link href="/login" className="text-sm font-medium hover:underline underline-offset-4">
+          {/* <Link href="/login" className="text-sm font-medium hover:underline underline-offset-4">
             Log In
-          </Link>
+          </Link> */}
           <Link href="/login">
             <Button size="sm">Staff login</Button>
           </Link>
@@ -115,13 +115,13 @@ export default function Navbar() {
             FAQ
           </Link>
           <div className="mt-6 flex flex-col gap-4">
-            <Link
+            {/* <Link
               href="/login"
               className="w-full rounded-md border border-input px-4 py-2 text-center text-sm font-medium"
               onClick={() => setIsMenuOpen(false)}
             >
               Log In
-            </Link>
+            </Link> */}
             <Link href="/login" className="w-full">
               <Button className="w-full" onClick={() => setIsMenuOpen(false)}>
                 Staff login

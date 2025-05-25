@@ -17,7 +17,13 @@ interface CarFromDB {
   // other car properties if needed
 }
 
-const COLORS = ['#0088FE', '#FF8042', '#FFBB28', '#00C49F', '#AF19FF']; // Add more colors if more statuses
+const COLORS = [
+  'hsl(var(--chart-1))',
+  'hsl(var(--chart-2))',
+  'hsl(var(--chart-3))',
+  'hsl(var(--chart-4))',
+  '#AF19FF', // Fallback for 5th+ category
+];
 
 export function CarStatusOverview() {
   const [statusData, setStatusData] = useState<CarStatus[]>([]);
@@ -48,7 +54,7 @@ export function CarStatusOverview() {
 
   if (loading) {
     return (
-      <Card className="col-span-1 md:col-span-1 lg:col-span-1 flex items-center justify-center h-[280px]">
+      <Card className="col-span-1 md:col-span-1 lg:col-span-1 flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </Card>
     );
@@ -56,7 +62,7 @@ export function CarStatusOverview() {
 
   if (error) {
     return (
-      <Card className="col-span-1 md:col-span-1 lg:col-span-1 flex flex-col items-center justify-center h-[280px] text-destructive">
+      <Card className="col-span-1 md:col-span-1 lg:col-span-1 flex flex-col items-center justify-center text-destructive p-4">
         <AlertTriangle className="h-8 w-8 mb-2" />
         <p className="text-center text-sm px-4">{error}</p>
       </Card>
@@ -65,7 +71,7 @@ export function CarStatusOverview() {
   
   if (statusData.length === 0 && !loading && !error) {
     return (
-       <Card className="col-span-1 md:col-span-1 lg:col-span-1 flex flex-col items-center justify-center h-[280px]">
+       <Card className="col-span-1 md:col-span-1 lg:col-span-1 flex flex-col items-center justify-center">
         <CardHeader className="pb-2"><CardTitle className="text-lg font-medium">Car Status Overview</CardTitle></CardHeader>
         <CardContent className="flex-grow flex items-center justify-center">
             <p className="text-muted-foreground">No car status data available.</p>
@@ -75,12 +81,12 @@ export function CarStatusOverview() {
   }
 
   return (
-    <Card className="col-span-1 md:col-span-1 lg:col-span-1 h-[280px]">
+    <Card className="col-span-1 md:col-span-1 lg:col-span-1 flex flex-col">
       <CardHeader className="pb-2">
         <CardTitle className="text-lg font-medium">Car Status Overview</CardTitle>
         <CardDescription className="text-sm">Current distribution of cars by status.</CardDescription>
       </CardHeader>
-      <CardContent className="pb-4 h-[calc(100%-4.5rem)]"> {/* Adjust height based on CardHeader height */}
+      <CardContent className="pb-4 flex-grow">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie

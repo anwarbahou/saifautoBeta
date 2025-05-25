@@ -13,7 +13,7 @@ const LandingPage = async () => {
   const fleetContent = await NewFleetSection();
 
   return (
-    <div className="flex flex-col min-h-screen bg-background">
+    <div className="light flex flex-col min-h-screen bg-white">
       <NewNavbar />
       <main className="flex-grow">
         <NewHeroSection />

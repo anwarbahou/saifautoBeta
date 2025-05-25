@@ -38,19 +38,28 @@ export async function createServerSupabaseClient() {
 }
 
 // Cars actions
-export async function getCars() {
-  const supabase = await createServerSupabaseClient() // Continues to use ssr client
-  const { data, error } = await supabase
+export async function getCars(page: number = 1, itemsPerPage: number = 12): Promise<{ data: any[]; count: number | null; error?: string }> {
+  const supabase = await createServerSupabaseClient()
+  const startIndex = (page - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage - 1;
+
+  // Fetch paginated data and total count in parallel
+  const {
+    data,
+    error,
+    count,
+  } = await supabase
     .from("cars")
-    .select("*")
+    .select("*", { count: "exact" }) // Request total count
     .order("created_at", { ascending: false })
+    .range(startIndex, endIndex); // Apply pagination range
 
   if (error) {
     console.error("Error fetching cars:", error)
-    return []
+    return { data: [], count: 0, error: error.message };
   }
 
-  return data
+  return { data: data || [], count: count };
 }
 
 export async function addCar(car: any): Promise<{ success: boolean; data?: any; error?: string; fieldErrors?: Record<string, string> }> {

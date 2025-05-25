@@ -29,11 +29,18 @@ export function RecentlyAddedCars() {
       try {
         setLoading(true);
         setError(null);
-        const allCars: Car[] = await getCars(); // getCars should sort by creation date descending
-        setCars(allCars.slice(0, 4)); // Take the first 4 for example
-      } catch (e) {
+        const response = await getCars(1, 4);
+        
+        if (response.error) {
+          throw new Error(response.error);
+        }
+
+        // Explicitly use response.data and ensure it's an array
+        setCars(Array.isArray(response.data) ? response.data : []);
+      } catch (e: any) {
         console.error("Failed to fetch recent cars:", e);
-        setError("An unexpected error occurred while fetching cars.");
+        setError(e.message || "An unexpected error occurred while fetching cars.");
+        setCars([]); // Ensure cars is an empty array on error
       } finally {
         setLoading(false);
       }

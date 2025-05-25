@@ -139,7 +139,7 @@ export default function LoginPage() {
             options={particleOptions}
           />
         )}
-        <Card className="w-full max-w-md z-10" style={{ backgroundColor: '#232323' }}>
+        <Card className="w-full max-w-md z-10">
           <CardHeader className="space-y-2 text-center">
             <div className="flex justify-center">
               <div className="rounded-full bg-blue-600 p-2">
@@ -164,7 +164,7 @@ export default function LoginPage() {
           className="absolute top-0 left-0 w-full h-full z-0"
         />
       )}
-      <Card className="w-full max-w-md z-10" style={{ backgroundColor: '#232323' }}>
+      <Card className="w-full max-w-md z-10">
         <CardHeader className="space-y-2 text-center">
           <div className="flex justify-center">
             <div className="rounded-full bg-blue-600 p-2">
@@ -183,14 +183,14 @@ export default function LoginPage() {
                 variables: {
                   default: {
                     colors: {
-                      brand: '#000000',
-                      brandAccent: '#111111',
-                      brandButtonText: '#ffffff',
+                      brand: 'hsl(var(--primary))',
+                      brandAccent: 'hsl(var(--primary-foreground))',
+                      brandButtonText: 'hsl(var(--primary-foreground))',
                       inputBackground: 'hsl(var(--background))',
                       inputText: 'hsl(var(--foreground))',
                       inputBorder: 'hsl(var(--border))',
-                      inputBorderFocus: 'hsl(221.2 83.2% 53.3%)',
-                      inputBorderHover: 'hsl(221.2 83.2% 53.3%)',
+                      inputBorderFocus: 'hsl(var(--ring))',
+                      inputBorderHover: 'hsl(var(--border))',
                     },
                   },
                 },

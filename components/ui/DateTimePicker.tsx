@@ -95,7 +95,7 @@ export function DateTimePicker({ value, onChange, disabled }: DateTimePickerProp
             !date && "text-muted-foreground"
           )}
         >
-          <CalendarIcon className="mr-2 h-4 w-4" />
+          <CalendarIcon className="mr-2 h-5 w-5" />
           {date ? (
             format(date, "MM/dd/yyyy hh:mm aa")
           ) : (
