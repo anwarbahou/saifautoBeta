@@ -7,10 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Users, Fuel, Cog, CalendarDays, DollarSign, CheckCircle, XCircle } from "lucide-react";
-import { useState } from "react";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import { useRouter } from "next/navigation";
-import { toast } from "react-hot-toast";
+import BookingForm from "./BookingForm";
 
 interface CarDetailsData {
   id: string | number;
@@ -20,12 +17,12 @@ interface CarDetailsData {
   type: string;
   year: number | null;
   color: string | null;
-  price_per_day: number;
+  daily_rate: number;
   image_url: string;
   images: string[] | null;
-  seats: number | null; // Will be null as it's not in DB
-  fuel_type: string | null; // Will be null as it's not in DB
-  transmission: string | null; // Will be null as it's not in DB
+  seats: number | null;
+  fuel_type: string | null;
+  transmission: string | null;
   status: string | null;
 }
 
@@ -59,7 +56,7 @@ async function fetchCarDetails(id: string): Promise<CarDetailsData | null> {
       type: car_data.category || "N/A",
       year: car_data.year,
       color: car_data.color,
-      price_per_day: car_data.daily_rate || 0,
+      daily_rate: car_data.daily_rate || 0,
       image_url: car_data.primary_image || "/img/cars/car-placeholder.png",
       images: car_data.images,
       seats: null, // Explicitly null as not fetched
@@ -139,7 +136,7 @@ export default async function CarDetailsPage({ params }: CarDetailsPageProps) {
             <div className="mb-8 p-4 bg-gray-100 dark:bg-gray-800/50 rounded-lg flex flex-col sm:flex-row justify-between items-center gap-4">
                 <div>
                     <p className="text-3xl font-bold text-primary">
-                        ${car.price_per_day}
+                        ${car.daily_rate}
                         <span className="text-lg font-normal text-muted-foreground">/day</span>
                     </p>
                 </div>
@@ -227,105 +224,4 @@ export default async function CarDetailsPage({ params }: CarDetailsPageProps) {
       <NewFooter />
     </div>
   );
-}
-
-const BookingForm = ({ car }: { car: any }) => {
-  const [form, setForm] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-    pickupDate: "",
-    returnDate: "",
-  });
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState("");
-  const supabase = createClientComponentClient();
-  const router = useRouter();
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-    setSuccess(false);
-    try {
-      // Insert booking into Supabase
-      const { data, error } = await supabase.from("bookings").insert([
-        {
-          first_name: form.firstName,
-          last_name: form.lastName,
-          email: form.email,
-          phone: form.phone,
-          start_date: form.pickupDate,
-          end_date: form.returnDate,
-          car_id: car.id,
-          car_make: car.make,
-          car_model: car.model,
-          car_name: car.name,
-          car_type: car.type,
-          car_year: car.year,
-          car_color: car.color,
-          car_price_per_day: car.price_per_day,
-        },
-      ]);
-      if (error) {
-        setError("Failed to create booking. Please try again.");
-        return;
-      }
-      setSuccess(true);
-      toast.success("Booking request sent!");
-      setForm({
-        firstName: "",
-        lastName: "",
-        email: "",
-        phone: "",
-        pickupDate: "",
-        returnDate: "",
-      });
-      router.refresh();
-    } catch (err) {
-      setError("An unexpected error occurred.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-4" aria-label="Booking form">
-      <div>
-        <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">First Name</label>
-        <input type="text" id="firstName" name="firstName" autoComplete="given-name" required value={form.firstName} onChange={handleChange} className="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 focus:ring-primary focus:border-primary" tabIndex={0} aria-label="First Name" />
-      </div>
-      <div>
-        <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Last Name</label>
-        <input type="text" id="lastName" name="lastName" autoComplete="family-name" required value={form.lastName} onChange={handleChange} className="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 focus:ring-primary focus:border-primary" tabIndex={0} aria-label="Last Name" />
-      </div>
-      <div>
-        <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email Address</label>
-        <input type="email" id="email" name="email" autoComplete="email" required value={form.email} onChange={handleChange} className="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 focus:ring-primary focus:border-primary" tabIndex={0} aria-label="Email Address" />
-      </div>
-      <div>
-        <label htmlFor="phone" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Phone Number</label>
-        <input type="tel" id="phone" name="phone" autoComplete="tel" required value={form.phone} onChange={handleChange} className="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 focus:ring-primary focus:border-primary" tabIndex={0} aria-label="Phone Number" />
-      </div>
-      <div>
-        <label htmlFor="pickupDate" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Pick-up Date</label>
-        <input type="date" id="pickupDate" name="pickupDate" required value={form.pickupDate} onChange={handleChange} className="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 focus:ring-primary focus:border-primary" tabIndex={0} aria-label="Pick-up Date" />
-      </div>
-      <div>
-        <label htmlFor="returnDate" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Return Date</label>
-        <input type="date" id="returnDate" name="returnDate" required value={form.returnDate} onChange={handleChange} className="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 focus:ring-primary focus:border-primary" tabIndex={0} aria-label="Return Date" />
-      </div>
-      <Button type="submit" className="w-full text-lg py-3 mt-2" size="lg" disabled={loading} aria-label="Request to Book">
-        {loading ? "Submitting..." : "Request to Book"}
-      </Button>
-      {success && <p className="text-green-600 text-center mt-2" role="status">Booking request sent!</p>}
-      {error && <p className="text-red-600 text-center mt-2" role="alert">{error}</p>}
-    </form>
-  );
-}; 
+} 
