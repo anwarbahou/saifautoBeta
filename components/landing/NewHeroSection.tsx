@@ -66,15 +66,15 @@ export default function NewHeroSection() {
     <section className="relative w-full overflow-hidden pt-16 md:pt-24 lg:pt-32">
       {/* Background with overlay */}
       <div className="absolute inset-0 z-0">
-        {/* Replace with a relevant image from your public folder or a proper Unsplash/Pexels URL */}
         <Image
-          src="/img/hero-background.jpg" // Placeholder - ensure this image exists in /public/img/
-          alt="Luxury car on road"
+          src="/heroimage.jpg"
+          alt="Car rental parking lot with various vehicles"
           fill
-          className="object-cover"
+          className="object-cover object-center"
           priority
+          quality={100}
         />
-        <div className="absolute inset-0 bg-black/60" /> {/* Slightly darker overlay */}
+        <div className="absolute inset-0 bg-black/50" /> {/* Slightly adjusted overlay for better contrast */}
       </div>
 
       <div className="container relative z-10 mx-auto px-4 py-16 sm:px-6">

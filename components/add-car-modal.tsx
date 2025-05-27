@@ -46,6 +46,7 @@ export function AddCarModal({ onAddCar }: AddCarModalProps) {
   const [primaryImageIndex, setPrimaryImageIndex] = useState(-1)
   const [activeTab, setActiveTab] = useState("details")
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [pendingFiles, setPendingFiles] = useState<File[]>([])
   const imageUploadRef = useRef<ImageUploadRef>(null)
   const { toast } = useToast()
 
@@ -65,20 +66,20 @@ export function AddCarModal({ onAddCar }: AddCarModalProps) {
 
   async function onSubmit(values: FormValues) {
     setIsSubmitting(true)
-    let finalImageUrls = [...images];
-    let currentPrimaryIndex = primaryImageIndex;
 
     try {
+      // Upload any pending files and get their URLs
+      let newUploadedUrls: string[] = [];
       if (imageUploadRef.current && imageUploadRef.current.getPendingFilesCount() > 0) {
-        const newUploadedUrls = await imageUploadRef.current.uploadPendingFilesAndGetUrls();
-        if (newUploadedUrls.length > 0) {
-          finalImageUrls = [...finalImageUrls, ...newUploadedUrls];
-          setImages(finalImageUrls);
-        }
+        newUploadedUrls = await imageUploadRef.current.uploadPendingFilesAndGetUrls();
         imageUploadRef.current.clearPendingFiles();
       }
 
-      if (currentPrimaryIndex === -1 && finalImageUrls.length > 0) {
+      // Combine already uploaded images and new uploaded URLs
+      const allImageUrls = [...images, ...newUploadedUrls];
+      let currentPrimaryIndex = primaryImageIndex;
+
+      if (currentPrimaryIndex === -1 && allImageUrls.length > 0) {
         currentPrimaryIndex = 0;
         setPrimaryImageIndex(0);
       }
@@ -92,9 +93,9 @@ export function AddCarModal({ onAddCar }: AddCarModalProps) {
         licensePlate: values.licensePlate,
         status: values.status,
         dailyRate: Number.parseFloat(values.dailyRate),
-        images: finalImageUrls,
-        primaryImage: currentPrimaryIndex >= 0 && finalImageUrls[currentPrimaryIndex] ? finalImageUrls[currentPrimaryIndex] : null,
-      }
+        images: allImageUrls,
+        primaryImage: currentPrimaryIndex >= 0 && allImageUrls[currentPrimaryIndex] ? allImageUrls[currentPrimaryIndex] : null,
+      };
 
       const result = await onAddCar(newCar);
 
@@ -108,29 +109,28 @@ export function AddCarModal({ onAddCar }: AddCarModalProps) {
           licensePlate: "",
           status: "Available",
           dailyRate: "",
-        })
-        setImages([])
-        setPrimaryImageIndex(-1)
-        setActiveTab("details")
-        setOpen(false)
+        });
+        setImages([]);
+        setPrimaryImageIndex(-1);
+        setActiveTab("details");
+        setOpen(false);
       } else {
-        const errorMessage = result?.error || "An unexpected error occurred while adding the car. Please try again."
+        const errorMessage = result?.error || "An unexpected error occurred while adding the car. Please try again.";
         toast({
           title: "Error Adding Car",
           description: errorMessage,
           variant: "destructive",
-        })
+        });
       }
-
     } catch (error: any) {
-      const errorMessage = error?.message || "An unexpected client-side error occurred. Please try again."
+      const errorMessage = error?.message || "An unexpected client-side error occurred. Please try again.";
       toast({
         title: "Critical Client Error",
         description: errorMessage,
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
   }
 
@@ -348,6 +348,8 @@ export function AddCarModal({ onAddCar }: AddCarModalProps) {
                     onImagesChange={(updatedImages) => setImages(updatedImages)}
                     primaryImageIndex={primaryImageIndex}
                     onPrimaryImageChange={setPrimaryImageIndex}
+                    pendingFiles={pendingFiles}
+                    setPendingFiles={setPendingFiles}
                   />
                 </div>
               </TabsContent>

@@ -501,6 +501,8 @@ export function CarsList() {
             car={viewingCar}
             open={isViewModalOpen}
             onOpenChange={setIsViewModalOpen}
+            onEdit={handleEditCar}
+            onDelete={handleDeleteCar}
           />
         )}
       </CardFooter>
