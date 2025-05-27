@@ -47,45 +47,81 @@ const BookingForm = ({ car }: { car: Car }) => {
         return;
       }
 
-      // Calculate total price based on number of days and daily rate
-      const days = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
-      const totalPrice = days * car.daily_rate;
-
       console.log("Creating client with data:", {
         name: `${form.firstName} ${form.lastName}`,
         email: form.email,
         phone: form.phone,
       });
 
-      // 1. Create or get client first
-      const { data: clientData, error: clientError } = await supabase
+      // 1. First try to get existing client
+      const { data: existingClient, error: fetchError } = await supabase
         .from("clients")
-        .upsert({
-          name: `${form.firstName} ${form.lastName}`,
-          email: form.email,
-          phone: form.phone,
-        })
         .select()
+        .eq('email', form.email)
         .single();
 
-      if (clientError) {
-        console.error("Client creation error details:", clientError);
-        setError(`Failed to create client profile: ${clientError.message || 'Unknown error'}`);
+      let clientId;
+
+      if (fetchError && fetchError.code !== 'PGRST116') { // PGRST116 means no rows returned
+        console.error("Error checking for existing client:", fetchError);
+        setError(`Failed to check existing client: ${fetchError.message || 'Unknown error'}`);
         return;
       }
 
-      if (!clientData?.id) {
-        console.error("No client ID returned:", clientData);
-        setError("Failed to create client profile: No client ID returned");
+      if (existingClient) {
+        // Update existing client
+        const { data: updatedClient, error: updateError } = await supabase
+          .from("clients")
+          .update({
+            name: `${form.firstName} ${form.lastName}`,
+            phone: form.phone,
+          })
+          .eq('email', form.email)
+          .select()
+          .single();
+
+        if (updateError) {
+          console.error("Error updating existing client:", updateError);
+          setError(`Failed to update client profile: ${updateError.message || 'Unknown error'}`);
+          return;
+        }
+        clientId = existingClient.id;
+      } else {
+        // Create new client
+        const { data: newClient, error: insertError } = await supabase
+          .from("clients")
+          .insert({
+            name: `${form.firstName} ${form.lastName}`,
+            email: form.email,
+            phone: form.phone,
+          })
+          .select()
+          .single();
+
+        if (insertError) {
+          console.error("Error creating new client:", insertError);
+          setError(`Failed to create client profile: ${insertError.message || 'Unknown error'}`);
+          return;
+        }
+        clientId = newClient.id;
+      }
+
+      if (!clientId) {
+        console.error("No client ID available after operation");
+        setError("Failed to process client information");
         return;
       }
 
-      console.log("Client created successfully:", clientData);
+      console.log("Client processed successfully, ID:", clientId);
+
+      // Calculate total price based on number of days and daily rate
+      const days = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+      const totalPrice = days * car.daily_rate;
 
       // 2. Create booking with correct schema
       const bookingData = {
         car_id: car.id,
-        client_id: clientData.id,
+        client_id: clientId,
         start_date: form.pickupDate,
         end_date: form.returnDate,
         total_price: totalPrice,
