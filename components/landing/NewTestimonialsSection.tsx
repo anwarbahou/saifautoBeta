@@ -64,7 +64,7 @@ export default function NewTestimonialsSection() {
   )
 
   return (
-    <section id="testimonials" className="py-16 md:py-20 bg-gray-100 dark:bg-gray-950">
+    <section id="testimonials" className="py-16 md:py-20 bg-gray-100">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12 md:mb-16">
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl mb-4">What Our Customers Say</h2>
@@ -85,7 +85,7 @@ export default function NewTestimonialsSection() {
             {testimonials.map((testimonial) => (
               <CarouselItem key={testimonial.id} className="pl-4 md:basis-1/2 lg:basis-1/3">
                 <div className="p-1 h-full">
-                  <Card className="h-full flex flex-col shadow-lg rounded-lg bg-white dark:bg-gray-800">
+                  <Card className="h-full flex flex-col shadow-lg rounded-lg bg-white">
                     <CardContent className="p-6 flex flex-col flex-grow">
                       <div className="flex items-center gap-4 mb-5">
                         <div className="relative h-14 w-14 overflow-hidden rounded-full shadow">
@@ -98,7 +98,7 @@ export default function NewTestimonialsSection() {
                           />
                         </div>
                         <div>
-                          <h3 className="font-semibold text-lg text-gray-900 dark:text-white">{testimonial.name}</h3>
+                          <h3 className="font-semibold text-lg text-gray-900">{testimonial.name}</h3>
                           <p className="text-sm text-muted-foreground">{testimonial.location}</p>
                         </div>
                       </div>
@@ -107,7 +107,7 @@ export default function NewTestimonialsSection() {
                           <Star
                             key={i}
                             className={`h-5 w-5 ${
-                              i < testimonial.rating ? "text-yellow-400 fill-yellow-400" : "text-gray-300 dark:text-gray-600"
+                              i < testimonial.rating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"
                             }`}
                           />
                         ))}

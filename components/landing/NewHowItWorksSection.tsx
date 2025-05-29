@@ -36,9 +36,9 @@ export default function NewHowItWorksSection() {
 
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
           {steps.map((step, index) => (
-            <div key={index} className="flex flex-col items-center text-center p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <div key={index} className="flex flex-col items-center text-center p-6 bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
               <div className="mb-6 rounded-full bg-primary/10 p-5 inline-block">{step.icon}</div>
-              <h3 className="mb-3 text-xl font-semibold text-gray-900 dark:text-white">{step.title}</h3>
+              <h3 className="mb-3 text-xl font-semibold text-gray-900">{step.title}</h3>
               <p className="text-muted-foreground leading-relaxed">{step.description}</p>
             </div>
           ))}

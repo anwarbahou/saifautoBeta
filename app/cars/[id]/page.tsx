@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Users, Fuel, Cog, CalendarDays, DollarSign, CheckCircle, XCircle } from "lucide-react";
 import BookingForm from "./BookingForm";
+import { SearchParams } from "@/lib/types";
 
 interface CarDetailsData {
   id: string | number;
@@ -72,10 +73,15 @@ async function fetchCarDetails(id: string): Promise<CarDetailsData | null> {
 
 interface CarDetailsPageProps {
   params: { id: string };
+  searchParams: SearchParams;
 }
 
-export default async function CarDetailsPage({ params }: CarDetailsPageProps) {
+export default async function CarDetailsPage({ params, searchParams }: CarDetailsPageProps) {
   const car = await fetchCarDetails(params.id);
+
+  // Get the dates from URL parameters
+  const pickupDateTime = searchParams.pickupDateTime ? new Date(searchParams.pickupDateTime) : null;
+  const dropoffDateTime = searchParams.dropoffDateTime ? new Date(searchParams.dropoffDateTime) : null;
 
   if (!car) {
     return (
@@ -114,14 +120,18 @@ export default async function CarDetailsPage({ params }: CarDetailsPageProps) {
                 <p className="text-muted-foreground mb-6">
                   Complete your details to request a booking for the {car.name}.
                 </p>
-                <BookingForm car={car} />
+                <BookingForm 
+                  car={car} 
+                  initialPickupDate={pickupDateTime ? pickupDateTime.toISOString().split('T')[0] : ''} 
+                  initialReturnDate={dropoffDateTime ? dropoffDateTime.toISOString().split('T')[0] : ''} 
+                />
               </CardContent>
             </Card>
           </div>
 
           {/* Right Column: Car Details */}
           <div className="md:col-span-2">
-            <div className="aspect-[16/9] w-full overflow-hidden rounded-lg shadow-xl mb-8 bg-gray-200 dark:bg-gray-700">
+            <div className="aspect-[16/9] w-full overflow-hidden rounded-lg shadow-xl mb-8 bg-gray-200">
               <Image
                 src={car.image_url || "/img/cars/car-placeholder.png"}
                 alt={`Image of ${car.name}`}
@@ -133,7 +143,7 @@ export default async function CarDetailsPage({ params }: CarDetailsPageProps) {
             </div>
             
             {/* Price and Status */}
-            <div className="mb-8 p-4 bg-gray-100 dark:bg-gray-800/50 rounded-lg flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div className="mb-8 p-4 bg-gray-100 rounded-lg flex flex-col sm:flex-row justify-between items-center gap-4">
                 <div>
                     <p className="text-3xl font-bold text-primary">
                         ${car.daily_rate}
@@ -142,7 +152,7 @@ export default async function CarDetailsPage({ params }: CarDetailsPageProps) {
                 </div>
                 <Badge 
                     variant={car.status === 'Rented' ? 'destructive' : 'outline'}
-                    className={`text-lg px-4 py-2 whitespace-nowrap ${car.status === 'Available' ? 'border-green-500 text-green-700 dark:border-green-400 dark:text-green-300 bg-green-50 dark:bg-green-900/30' : car.status === 'Rented' ? '' : 'border-yellow-500 text-yellow-700 dark:border-yellow-400 dark:text-yellow-300 bg-yellow-50 dark:bg-yellow-900/30' }`}
+                    className={`text-lg px-4 py-2 whitespace-nowrap ${car.status === 'Available' ? 'border-green-500 text-green-700 bg-green-50' : car.status === 'Rented' ? '' : 'border-yellow-500 text-yellow-700 bg-yellow-50' }`}
                 >
                     {car.status === 'Available' && <CheckCircle className="h-5 w-5 mr-2" />}
                     {/* For 'Rented', destructive variant already implies an issue, no specific icon needed unless desired */}
@@ -166,7 +176,7 @@ export default async function CarDetailsPage({ params }: CarDetailsPageProps) {
                   <Users className="h-5 w-5 text-primary" />
                   <span className="font-medium">Seats</span>
                 </div>
-                <span className="font-semibold text-gray-800 dark:text-gray-200">{car.seats || "N/A"}</span>
+                <span className="font-semibold text-gray-800">{car.seats || "N/A"}</span>
               </div>
 
               <div className="flex items-center justify-between">
@@ -174,7 +184,7 @@ export default async function CarDetailsPage({ params }: CarDetailsPageProps) {
                   <Fuel className="h-5 w-5 text-primary" />
                   <span className="font-medium">Fuel Type</span>
                 </div>
-                <span className="font-semibold text-gray-800 dark:text-gray-200">{car.fuel_type || "N/A"}</span>
+                <span className="font-semibold text-gray-800">{car.fuel_type || "N/A"}</span>
               </div>
 
               <div className="flex items-center justify-between">
@@ -182,7 +192,7 @@ export default async function CarDetailsPage({ params }: CarDetailsPageProps) {
                   <Cog className="h-5 w-5 text-primary" />
                   <span className="font-medium">Transmission</span>
                 </div>
-                <span className="font-semibold text-gray-800 dark:text-gray-200">{car.transmission || "N/A"}</span>
+                <span className="font-semibold text-gray-800">{car.transmission || "N/A"}</span>
               </div>
 
               <div className="flex items-center justify-between">
@@ -207,7 +217,7 @@ export default async function CarDetailsPage({ params }: CarDetailsPageProps) {
                   <CalendarDays className="h-5 w-5 text-primary" />
                   <span className="font-medium">Year</span>
                 </div>
-                <span className="font-semibold text-gray-800 dark:text-gray-200">{car.year || "N/A"}</span>
+                <span className="font-semibold text-gray-800">{car.year || "N/A"}</span>
               </div>
             </div>
             

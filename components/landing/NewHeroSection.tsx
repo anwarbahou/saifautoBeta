@@ -17,6 +17,7 @@ import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { DateTimePicker } from "@/components/ui/DateTimePicker" // Import the new component
 import { useRouter } from 'next/navigation'; // Import useRouter
+import { motion } from "framer-motion"
 
 const formSchema = z.object({
   destination: z.string({
@@ -78,7 +79,12 @@ export default function NewHeroSection() {
       </div>
 
       <div className="container relative z-10 mx-auto px-4 py-16 sm:px-6">
-        <div className="grid gap-12 lg:grid-cols-2 lg:gap-16 items-center">
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="grid gap-12 lg:grid-cols-2 lg:gap-16 items-center"
+        >
           <div className="flex flex-col justify-center text-white text-center lg:text-left">
             <h1 className="mb-6 text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl drop-shadow-md">Your Journey Begins Here</h1>
             <p className="mb-8 max-w-xl text-lg text-gray-200 sm:text-xl mx-auto lg:mx-0 drop-shadow-sm">
@@ -97,7 +103,7 @@ export default function NewHeroSection() {
           </div>
 
           <div className="flex items-center justify-center">
-            <Card className="w-full max-w-md shadow-2xl bg-white/90 backdrop-blur-md dark:bg-gray-900/90">
+            <Card className="w-full max-w-md shadow-2xl bg-white/90 backdrop-blur-md">
               <CardHeader className="text-center">
                 <CardTitle className="text-2xl">Book Your Dream Car</CardTitle>
                 <CardDescription>Find the perfect vehicle for your adventure</CardDescription>
@@ -188,7 +194,7 @@ export default function NewHeroSection() {
               </CardContent>
             </Card>
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   )

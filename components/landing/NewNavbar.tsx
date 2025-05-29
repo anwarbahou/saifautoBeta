@@ -13,31 +13,14 @@ export default function NewNavbar() {
   const pathname = usePathname()
 
   useEffect(() => {
-    const originalHtmlClass = document.documentElement.className;
-    if (pathname === "/") {
-      document.documentElement.className = 'light';
-    }
-
-    return () => {
-      // Only revert if it was changed by this effect
-      // and the current path is no longer the landing page
-      if (pathname === "/" && document.documentElement.className === 'light') {
-         document.documentElement.className = originalHtmlClass;
-      }
-      // If navigating away from landing, ensure it's not stuck on 'light'
-      // if the original was different (e.g. system or dark)
-      // This is a bit more robust if multiple effects could change the class.
-      if (pathname !== "/") {
-        document.documentElement.className = originalHtmlClass; 
-      }
-    };
-  }, [pathname]); // Rerun when pathname changes
+    document.documentElement.className = 'light';
+    return () => {};
+  }, [pathname]);
 
   // Force light mode for Navbar elements specifically for landing page
   const isLandingPage = pathname === '/';
   const headerClasses = cn(
-    "fixed left-0 right-0 top-0 z-50 backdrop-blur-md",
-    isLandingPage ? "bg-white/80" : "bg-white/80 dark:bg-gray-950/80" 
+    "fixed left-0 right-0 top-0 z-50 backdrop-blur-md bg-white/80"
   );
 
   return (
@@ -89,7 +72,7 @@ export default function NewNavbar() {
       {/* Mobile Navigation */}
       <div
         className={cn(
-          "fixed inset-x-0 top-16 z-50 h-[calc(100vh-4rem)] bg-white p-6 transition-transform duration-300 ease-in-out dark:bg-gray-950 md:hidden",
+          "fixed inset-x-0 top-16 z-50 h-[calc(100vh-4rem)] bg-white p-6 transition-transform duration-300 ease-in-out",
           isMenuOpen ? "translate-x-0" : "translate-x-full",
         )}
       >

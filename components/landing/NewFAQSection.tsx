@@ -56,11 +56,11 @@ export default function NewFAQSection() {
           </p>
         </div>
 
-        <div className="max-w-3xl mx-auto bg-white dark:bg-gray-800 p-6 sm:p-8 rounded-xl shadow-xl">
+        <div className="max-w-3xl mx-auto bg-white p-6 sm:p-8 rounded-xl shadow-xl">
           <Accordion type="single" collapsible className="w-full">
             {faqs.map((faq) => (
-              <AccordionItem key={faq.id} value={faq.id} className="border-b border-gray-200 dark:border-gray-700 last:border-b-0">
-                <AccordionTrigger className="text-left text-lg font-medium hover:no-underline py-5 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-gray-800 rounded-md">
+              <AccordionItem key={faq.id} value={faq.id} className="border-b border-gray-200 last:border-b-0">
+                <AccordionTrigger className="text-left text-lg font-medium hover:no-underline py-5 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-white rounded-md">
                   {faq.question}
                 </AccordionTrigger>
                 <AccordionContent className="pt-2 pb-5 text-base text-muted-foreground leading-relaxed">

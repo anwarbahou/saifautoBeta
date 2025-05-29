@@ -9,6 +9,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useSearchParams } from 'next/navigation';
 
 // Re-define CarData or import from a shared types file if available
 interface CarData {
@@ -32,6 +33,7 @@ const FleetControlsAndList: React.FC<FleetControlsAndListProps> = ({ initialCars
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedType, setSelectedType] = useState('all');
   const [selectedModel, setSelectedModel] = useState('all');
+  const searchParams = useSearchParams();
 
   const carTypes = useMemo(() => {
     const types = new Set(initialCars.map(car => car.type));
@@ -45,7 +47,9 @@ const FleetControlsAndList: React.FC<FleetControlsAndListProps> = ({ initialCars
 
   const filteredCars = useMemo(() => {
     return initialCars.filter(car => {
-      const matchesSearch = car.name.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesSearch = car.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        car.make.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        car.model.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesType = selectedType === 'all' || car.type === selectedType;
       const matchesModel = selectedModel === 'all' || car.model === selectedModel;
       return matchesSearch && matchesType && matchesModel;
@@ -64,6 +68,12 @@ const FleetControlsAndList: React.FC<FleetControlsAndListProps> = ({ initialCars
     setSelectedModel(value);
   };
 
+  // Build URL with search parameters
+  const getCarUrl = (carId: string | number) => {
+    const params = new URLSearchParams(searchParams.toString());
+    return `/cars/${carId}?${params.toString()}`;
+  };
+
   return (
     <>
       <div className="mb-8 p-4 md:p-6 bg-gray-100 dark:bg-gray-800/50 rounded-lg shadow">
@@ -73,7 +83,7 @@ const FleetControlsAndList: React.FC<FleetControlsAndListProps> = ({ initialCars
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
               <Input
                 type="search"
-                placeholder="Search by car name..."
+                placeholder="Search by make, model, or name..."
                 value={searchTerm}
                 onChange={handleSearchChange}
                 className="pl-10 w-full"
@@ -122,7 +132,7 @@ const FleetControlsAndList: React.FC<FleetControlsAndListProps> = ({ initialCars
           {filteredCars.map((car_item) => (
             <Card key={car_item.id} className="flex flex-col overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 bg-white dark:bg-gray-800">
               <CardHeader className="p-0 relative">
-                <Link href={`/cars/${car_item.id}`} aria-label={`View details for ${car_item.name}`}>
+                <Link href={getCarUrl(car_item.id)} aria-label={`View details for ${car_item.name}`}>
                   <div className="aspect-[16/10] w-full overflow-hidden">
                     <Image
                       src={car_item.image_url || "/img/cars/car-placeholder.png"}
@@ -162,7 +172,7 @@ const FleetControlsAndList: React.FC<FleetControlsAndListProps> = ({ initialCars
                   </p>
                 </div>
                 <Button asChild size="default" className="text-base font-semibold">
-                  <Link href={`/cars/${car_item.id}`}>Book Now</Link>
+                  <Link href={getCarUrl(car_item.id)}>Book Now</Link>
                 </Button>
               </CardFooter>
             </Card>

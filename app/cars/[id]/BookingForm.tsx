@@ -11,14 +11,20 @@ interface Car {
   name: string;
 }
 
-const BookingForm = ({ car }: { car: Car }) => {
+interface BookingFormProps {
+  car: Car;
+  initialPickupDate?: string;
+  initialReturnDate?: string;
+}
+
+const BookingForm = ({ car, initialPickupDate = "", initialReturnDate = "" }: BookingFormProps) => {
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
     email: "",
     phone: "",
-    pickupDate: "",
-    returnDate: "",
+    pickupDate: initialPickupDate,
+    returnDate: initialReturnDate,
   });
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);

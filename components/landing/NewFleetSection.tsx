@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image"
 import { Car, Fuel, Users, Cog } from "lucide-react"
 import Link from "next/link"
@@ -5,17 +7,19 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { supabase } from "@/lib/supabaseClient"; // Import Supabase client
+import { useSearchParams } from 'next/navigation';
+import { useState, useEffect } from 'react';
 
 // Removed unused carCategories static data
 
 export interface CarData {
-  id: string;
+  id: string | number;
   name: string;
-  make?: string;
-  model?: string;
-  type: string | null;
-  price_per_day: number | null;
-  image_url: string | null;
+  make: string;
+  model: string;
+  type: string;
+  price_per_day: number;
+  image_url: string;
   seats: number | null;
   fuel_type: string | null;
   transmission: string | null;
@@ -46,7 +50,9 @@ async function fetchCarsFromDB(): Promise<CarData[]> {
     // Map the fetched data to the CarData interface
     const formattedCars: CarData[] = cars_data.map((car_item: any) => ({
       id: car_item.id,
-      name: `${car_item.make || ''} ${car_item.model || ''}`.trim() || "Unknown Car",
+      name: `${car_item.make} ${car_item.model}`,
+      make: car_item.make,
+      model: car_item.model,
       type: car_item.category || "N/A",
       price_per_day: car_item.daily_rate || 0,
       image_url: car_item.primary_image || "/img/cars/car-placeholder.png", // Provide a fallback
@@ -62,11 +68,76 @@ async function fetchCarsFromDB(): Promise<CarData[]> {
   }
 }
 
-export default async function NewFleetSection() {
-  const cars: CarData[] = await fetchCarsFromDB();
+export function CarCard({ car }: { car: CarData }) {
+  const searchParams = useSearchParams();
+  const carUrl = `/cars/${car.id}?${searchParams.toString()}`;
 
   return (
-    <section id="fleet" className="py-16 md:py-20 bg-gray-50 dark:bg-gray-900">
+    <Card className="flex flex-col overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 bg-white">
+      <CardHeader className="p-0 relative">
+        <Link href={carUrl} aria-label={`View details for ${car.name}`}>
+          <div className="aspect-[16/10] w-full overflow-hidden">
+            <Image
+              src={car.image_url || "/img/cars/car-placeholder.png"}
+              alt={car.name}
+              width={600}
+              height={375}
+              className="object-cover w-full h-full transition-transform duration-300 hover:scale-105"
+            />
+          </div>
+        </Link>
+        <Badge variant="default" className="absolute top-4 right-4 bg-primary text-primary-foreground">
+          {car.type || "N/A"}
+        </Badge>
+      </CardHeader>
+      <CardContent className="p-5 flex-grow">
+        <CardTitle className="text-xl font-semibold mb-2 text-gray-900">{car.name}</CardTitle>
+        <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm text-muted-foreground mb-4">
+          <div className="flex items-center gap-2">
+            <Users className="h-4 w-4 text-primary" />
+            <span>{car.seats || "N/A"} Seats</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Fuel className="h-4 w-4 text-primary" />
+            <span>{car.fuel_type || "N/A"}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Cog className="h-4 w-4 text-primary" />
+            <span>{car.transmission || "N/A"}</span>
+          </div>
+        </div>
+      </CardContent>
+      <CardFooter className="p-5 bg-gray-50 border-t flex items-center justify-between">
+        <div>
+          <p className="text-2xl font-bold text-primary">
+            ${car.price_per_day}
+            <span className="text-sm font-normal text-muted-foreground">/day</span>
+          </p>
+        </div>
+        <Button asChild size="default" className="text-base font-semibold">
+          <Link href={carUrl}>Book Now</Link>
+        </Button>
+      </CardFooter>
+    </Card>
+  );
+}
+
+export default function NewFleetSection() {
+  const searchParams = useSearchParams();
+  const [cars, setCars] = useState<CarData[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadCars() {
+      const fetchedCars = await fetchCarsFromDB();
+      setCars(fetchedCars);
+      setLoading(false);
+    }
+    loadCars();
+  }, []);
+
+  return (
+    <section id="fleet" className="py-16 md:py-20 bg-gray-50">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12 md:mb-16">
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl mb-4">Explore Our Fleet</h2>
@@ -76,7 +147,11 @@ export default async function NewFleetSection() {
           </p>
         </div>
 
-        {cars && cars.length > 0 ? (
+        {loading ? (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">Loading cars...</p>
+          </div>
+        ) : cars && cars.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
             {cars.map((car_item) => (
               <CarCard key={car_item.id} car={car_item} />
@@ -94,61 +169,10 @@ export default async function NewFleetSection() {
 
         <div className="mt-12 md:mt-16 text-center">
           <Button asChild size="lg" className="text-lg font-semibold px-8 py-3">
-            <Link href="/fleet">View All Cars</Link>
+            <Link href={`/fleet?${searchParams.toString()}`}>View All Cars</Link>
           </Button>
         </div>
       </div>
     </section>
-  );
-}
-
-export function CarCard({ car }: { car: CarData }) {
-  return (
-    <Card className="flex flex-col overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 bg-white dark:bg-gray-800">
-      <CardHeader className="p-0 relative">
-        <Link href={`/cars/${car.id}`} aria-label={`View details for ${car.name}`}>
-          <div className="aspect-[16/10] w-full overflow-hidden">
-            <Image
-              src={car.image_url || "/img/cars/car-placeholder.png"}
-              alt={car.name}
-              width={600}
-              height={375}
-              className="object-cover w-full h-full transition-transform duration-300 hover:scale-105"
-            />
-          </div>
-        </Link>
-        <Badge variant="default" className="absolute top-4 right-4 bg-primary text-primary-foreground">
-          {car.type || "N/A"}
-        </Badge>
-      </CardHeader>
-      <CardContent className="p-5 flex-grow">
-        <CardTitle className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">{car.name}</CardTitle>
-        <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm text-muted-foreground mb-4">
-          <div className="flex items-center gap-2">
-            <Users className="h-4 w-4 text-primary" />
-            <span>{car.seats || "N/A"} Seats</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Fuel className="h-4 w-4 text-primary" />
-            <span>{car.fuel_type || "N/A"}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Cog className="h-4 w-4 text-primary" />
-            <span>{car.transmission || "N/A"}</span>
-          </div>
-        </div>
-      </CardContent>
-      <CardFooter className="p-5 bg-gray-50 dark:bg-gray-800/50 border-t dark:border-gray-700/50 flex items-center justify-between">
-        <div>
-          <p className="text-2xl font-bold text-primary">
-            ${car.price_per_day}
-            <span className="text-sm font-normal text-muted-foreground">/day</span>
-          </p>
-        </div>
-        <Button asChild size="default" className="text-base font-semibold">
-          <Link href={`/cars/${car.id}`}>Book Now</Link>
-        </Button>
-      </CardFooter>
-    </Card>
   );
 } 

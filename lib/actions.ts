@@ -269,17 +269,114 @@ export async function deleteCar(id: number): Promise<{ success: boolean; error?:
   }
 }
 
+interface Booking {
+  id: number;
+  start_date: string;
+  end_date: string;
+  total_price: string | number;
+  status: string;
+}
+
+interface ClientWithBookings {
+  id: number;
+  name: string;
+  email: string;
+  phone: string | null;
+  created_at: string;
+  bookings: Booking[];
+}
+
 // Clients actions
 export async function getClients() {
-  const supabase = await createServerSupabaseClient()
-  const { data, error } = await supabase.from("clients").select("*").order("id")
+  // Use the admin client with service role key to bypass RLS
+  const supabaseAdmin = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    {
+      auth: {
+        autoRefreshToken: false,
+      }
+    }
+  )
+  
+  // First, get all clients
+  const { data: clientsData, error: clientsError } = await supabaseAdmin
+    .from('clients')
+    .select('*')
+    .order('created_at', { ascending: false })
 
-  if (error) {
-    console.error("Error fetching clients:", error)
+  if (clientsError) {
+    console.error("Error fetching clients:", clientsError)
     return []
   }
 
-  return data
+  // Then, get all bookings for these clients
+  const { data: bookingsData, error: bookingsError } = await supabaseAdmin
+    .from('bookings')
+    .select(`
+      id,
+      start_date,
+      end_date,
+      total_price,
+      status,
+      created_at,
+      client_id
+    `)
+    .in('client_id', clientsData.map(client => client.id))
+    .order('created_at', { ascending: false })
+
+  if (bookingsError) {
+    console.error("Error fetching bookings:", bookingsError)
+    // Continue with empty bookings array rather than failing completely
+    return clientsData.map(client => ({
+      id: client.id,
+      name: client.name,
+      email: client.email,
+      phone: client.phone,
+      join_date: client.created_at,
+      status: 'Inactive',
+      total_bookings: 0,
+      active_bookings: 0,
+      completed_bookings: 0,
+      total_spent: 0,
+      last_booking_date: null
+    }))
+  }
+
+  // Create a map of client_id to their bookings
+  const bookingsByClient = bookingsData?.reduce((acc: { [key: string]: any[] }, booking: any) => {
+    if (!acc[booking.client_id]) {
+      acc[booking.client_id] = []
+    }
+    acc[booking.client_id].push(booking)
+    return acc
+  }, {}) || {}
+
+  // Process each client's data
+  const processedClients = clientsData.map(client => {
+    const bookings = bookingsByClient[client.id] || []
+    const activeBookings = bookings.filter((b: Booking) => b.status === 'Active' || b.status === 'Confirmed')
+    const completedBookings = bookings.filter((b: Booking) => b.status === 'Completed')
+    const totalSpent = bookings.reduce((sum: number, b: Booking) => sum + (parseFloat(b.total_price.toString()) || 0), 0)
+    const lastBooking = bookings.length > 0 ? 
+      bookings.sort((a: Booking, b: Booking) => new Date(b.start_date).getTime() - new Date(a.start_date).getTime())[0] : null
+
+    return {
+      id: client.id,
+      name: client.name,
+      email: client.email,
+      phone: client.phone,
+      join_date: client.created_at,
+      status: activeBookings.length > 0 ? 'Active' : 'Inactive',
+      total_bookings: bookings.length,
+      active_bookings: activeBookings.length,
+      completed_bookings: completedBookings.length,
+      total_spent: totalSpent,
+      last_booking_date: lastBooking ? lastBooking.start_date : null
+    }
+  })
+
+  return processedClients
 }
 
 // Bookings actions
@@ -393,4 +490,16 @@ export async function getDashboardStats() {
     availableCars: 12,
     totalClients: 45,
   }
+}
+
+export async function deleteClient(id: number): Promise<{ success: boolean; error?: string }> {
+  const supabaseAdmin = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+  const { error } = await supabaseAdmin.from("clients").delete().eq("id", id);
+  if (error) {
+    return { success: false, error: error.message };
+  }
+  return { success: true };
 }

@@ -1,12 +1,11 @@
 import { Suspense } from 'react';
-import LandingPlaceholder from './LandingPage'; // Assuming LandingPage.tsx is in the same app directory
-import LoadingSpinner from '@/components/ui/loading-spinner'; // Import the new spinner
+import LandingPage from './LandingPage';
+import LoadingSpinner from '@/components/ui/loading-spinner';
 
-export default async function Page() {
+export default function Page() {
   return (
     <Suspense fallback={<LoadingSpinner />}>
-      {/* @ts-expect-error Server Component */}
-      <LandingPlaceholder />
+      <LandingPage />
     </Suspense>
   );
 } 

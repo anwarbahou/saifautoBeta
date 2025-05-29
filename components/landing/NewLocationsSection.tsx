@@ -41,7 +41,7 @@ const locations = [
 
 export default function NewLocationsSection() {
   return (
-    <section id="locations" className="py-16 md:py-20 bg-gray-50 dark:bg-gray-900">
+    <section id="locations" className="py-16 md:py-20 bg-gray-50">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12 md:mb-16">
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl mb-4">Our Locations</h2>
@@ -65,16 +65,16 @@ export default function NewLocationsSection() {
                   <h3 className="text-2xl font-semibold text-white drop-shadow-md">{location.city}</h3>
                 </div>
               </div>
-              <CardContent className="p-6 flex-grow flex flex-col gap-3 bg-white dark:bg-gray-800">
-                <div className="flex items-start gap-3 text-sm text-gray-700 dark:text-gray-300">
+              <CardContent className="p-6 flex-grow flex flex-col gap-3 bg-white">
+                <div className="flex items-start gap-3 text-sm text-gray-700">
                   <MapPin className="h-5 w-5 text-primary shrink-0 mt-0.5" />
                   <span>{location.address}</span>
                 </div>
-                <div className="flex items-center gap-3 text-sm text-gray-700 dark:text-gray-300">
+                <div className="flex items-center gap-3 text-sm text-gray-700">
                   <Phone className="h-4 w-4 text-primary shrink-0" />
                   <span>{location.phone}</span>
                 </div>
-                <div className="flex items-center gap-3 text-sm text-gray-700 dark:text-gray-300">
+                <div className="flex items-center gap-3 text-sm text-gray-700">
                   <Clock className="h-4 w-4 text-primary shrink-0" />
                   <span>{location.hours}</span>
                 </div>

@@ -9,15 +9,13 @@ import NewHowItWorksSection from "@/components/landing/NewHowItWorksSection";
 import NewLocationsSection from "@/components/landing/NewLocationsSection";
 import NewTestimonialsSection from "@/components/landing/NewTestimonialsSection";
 
-const LandingPage = async () => {
-  const fleetContent = await NewFleetSection();
-
+const LandingPage = () => {
   return (
     <div className="light flex flex-col min-h-screen bg-white">
       <NewNavbar />
       <main className="flex-grow">
         <NewHeroSection />
-        {fleetContent}
+        <NewFleetSection />
         <NewHowItWorksSection />
         <NewLocationsSection />
         <NewTestimonialsSection />
@@ -29,4 +27,4 @@ const LandingPage = async () => {
   );
 }
 
-export default LandingPage 
+export default LandingPage; 
