@@ -19,4 +19,9 @@ Backend/DB: Supabase
 State & Forms: React Hook Form, Zod
 Charts: Recharts
 Other: Framer Motion, Embla Carousel, Lucide Icons
-ANwar
+
+
+Made with love, while listening to drake
+May the next developers who work on this project in the
+hundreds of years that are yet to come, find happiness
+and maybe go outside from time to time
