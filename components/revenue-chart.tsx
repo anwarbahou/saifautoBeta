@@ -39,7 +39,7 @@ export function RevenueChart() {
           <LineChart data={data} margin={{ top: 5, right: 10, left: 10, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} />
             <XAxis dataKey="month" tickLine={false} axisLine={false} tickMargin={10} />
-            <YAxis tickFormatter={(value) => `$${value / 1000}k`} tickLine={false} axisLine={false} tickMargin={10} />
+            <YAxis tickFormatter={(value) => `${value / 1000}k MAD`} tickLine={false} axisLine={false} tickMargin={10} />
             <ChartTooltip content={<ChartTooltipContent />} />
             <Line
               type="monotone"

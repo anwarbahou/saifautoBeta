@@ -8,6 +8,7 @@ import { supabase } from "@/lib/supabaseClient";
 import NewNavbar from "@/components/landing/NewNavbar";
 import NewFooter from "@/components/landing/NewFooter";
 import FleetControlsAndList from "@/components/fleet/FleetControlsAndList";
+import FleetHero from "@/components/fleet/FleetHero";
 
 interface CarData {
   id: string | number;
@@ -64,15 +65,10 @@ export default async function FleetPage() {
   const allCarsData: CarData[] = await fetchAllCars();
 
   return (
-    <div className="flex flex-col min-h-screen bg-background">
+    <div className="flex flex-col min-h-screen bg-white">
       <NewNavbar />
       <main className="flex-grow container mx-auto px-4 py-12 md:py-16">
-        <div className="text-center mb-12 md:mb-16">
-          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl mb-4">Our Entire Fleet</h1>
-          <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-            Browse through our comprehensive collection of vehicles. Find the perfect car for your next journey.
-          </p>
-        </div>
+        <FleetHero />
         <FleetControlsAndList initialCars={allCarsData} />
       </main>
       <NewFooter />

@@ -40,7 +40,7 @@ export function OverviewStats() {
   const statsConfig = [
     {
       title: "Total Revenue",
-      value: `$${stats.totalRevenue.toFixed(2)}`,
+      value: `${stats.totalRevenue.toFixed(2)} MAD`,
       change: "+20.1%",
       icon: DollarSign,
     },

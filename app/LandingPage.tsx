@@ -6,7 +6,6 @@ import NewFAQSection from "@/components/landing/NewFAQSection";
 import NewFleetSection from "@/components/landing/NewFleetSection";
 import NewFooter from "@/components/landing/NewFooter";
 import NewHowItWorksSection from "@/components/landing/NewHowItWorksSection";
-import NewLocationsSection from "@/components/landing/NewLocationsSection";
 import NewTestimonialsSection from "@/components/landing/NewTestimonialsSection";
 
 const LandingPage = () => {
@@ -17,7 +16,6 @@ const LandingPage = () => {
         <NewHeroSection />
         <NewFleetSection />
         <NewHowItWorksSection />
-        <NewLocationsSection />
         <NewTestimonialsSection />
         <NewFAQSection />
         <NewCTASection />

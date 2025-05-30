@@ -127,7 +127,7 @@ export function LatestBookings() {
                     <Badge variant={getStatusBadgeVariant(booking.status)}>{booking.status}</Badge>
                   </TableCell>
                   <TableCell className="text-right hidden md:table-cell">
-                    {booking.total_amount ? `$${booking.total_amount.toFixed(2)}` : "-"}
+                    {booking.total_amount ? `${booking.total_amount.toFixed(2)} MAD` : "-"}
                   </TableCell>
                 </TableRow>
               ))}

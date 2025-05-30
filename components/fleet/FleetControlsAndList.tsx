@@ -80,7 +80,7 @@ const FleetControlsAndList: React.FC<FleetControlsAndListProps> = ({ initialCars
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
           <div className="md:col-span-1">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-600" />
               <Input
                 type="search"
                 placeholder="Search by make, model, or name..."
@@ -149,7 +149,7 @@ const FleetControlsAndList: React.FC<FleetControlsAndListProps> = ({ initialCars
               </CardHeader>
               <CardContent className="p-5 flex-grow">
                 <CardTitle className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">{car_item.name}</CardTitle>
-                <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm text-muted-foreground mb-4">
+                <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm text-gray-600 mb-4">
                   <div className="flex items-center gap-2">
                     <Users className="h-4 w-4 text-primary" />
                     <span>{car_item.seats || "N/A"} Seats</span>
@@ -167,8 +167,8 @@ const FleetControlsAndList: React.FC<FleetControlsAndListProps> = ({ initialCars
               <CardFooter className="p-5 bg-gray-50 dark:bg-gray-800/50 border-t dark:border-gray-700/50 flex items-center justify-between">
                 <div>
                   <p className="text-2xl font-bold text-primary">
-                    ${car_item.price_per_day}
-                    <span className="text-sm font-normal text-muted-foreground">/day</span>
+                    {car_item.price_per_day} MAD
+                    <span className="text-sm font-normal text-gray-600">/day</span>
                   </p>
                 </div>
                 <Button asChild size="default" className="text-base font-semibold">
@@ -180,9 +180,9 @@ const FleetControlsAndList: React.FC<FleetControlsAndListProps> = ({ initialCars
         </div>
       ) : (
         <div className="text-center py-12 col-span-full">
-          <Search className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
+          <Search className="h-16 w-16 mx-auto text-gray-600 mb-4" />
           <h3 className="text-xl font-semibold mb-2">No Cars Match Your Criteria</h3>
-          <p className="text-muted-foreground">
+          <p className="text-gray-600">
             Try adjusting your search or filters.
           </p>
         </div>

@@ -3,32 +3,32 @@ import Image from "next/image"
 const cars = [
   {
     name: "BMW 5 Series",
-    price: "$120/day",
+    price: "120 MAD/day",
     image: "https://images.unsplash.com/photo-1511918984145-48de785d4c4e?auto=format&fit=crop&w=400&q=80",
   },
   {
     name: "Audi Q7",
-    price: "$140/day",
+    price: "140 MAD/day",
     image: "https://images.unsplash.com/photo-1503736334956-4c8f8e92946d?auto=format&fit=crop&w=400&q=80",
   },
   {
     name: "Mercedes C-Class",
-    price: "$110/day",
+    price: "110 MAD/day",
     image: "https://images.unsplash.com/photo-1461632830798-3adb3034e4c8?auto=format&fit=crop&w=400&q=80",
   },
   {
     name: "Toyota Corolla",
-    price: "$60/day",
+    price: "60 MAD/day",
     image: "https://images.unsplash.com/photo-1502877338535-766e1452684a?auto=format&fit=crop&w=400&q=80",
   },
   {
     name: "Range Rover Evoque",
-    price: "$160/day",
+    price: "160 MAD/day",
     image: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=400&q=80",
   },
   {
     name: "Honda Civic",
-    price: "$55/day",
+    price: "55 MAD/day",
     image: "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=400&q=80",
   },
 ]

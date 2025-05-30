@@ -85,6 +85,8 @@ export default async function CarDetailsPage({ params, searchParams }: CarDetail
   const pickupDateTime = resolvedSearchParams.pickupDateTime ? new Date(resolvedSearchParams.pickupDateTime) : null;
   const dropoffDateTime = resolvedSearchParams.dropoffDateTime ? new Date(resolvedSearchParams.dropoffDateTime) : null;
 
+  const pickupLocation = resolvedSearchParams.destination || resolvedSearchParams.pickup_location || "";
+
   if (!car) {
     return (
       <div className="flex flex-col min-h-screen bg-background">
@@ -126,6 +128,7 @@ export default async function CarDetailsPage({ params, searchParams }: CarDetail
                   car={car} 
                   initialPickupDate={pickupDateTime ? pickupDateTime.toISOString().split('T')[0] : ''} 
                   initialReturnDate={dropoffDateTime ? dropoffDateTime.toISOString().split('T')[0] : ''} 
+                  initialPickupLocation={pickupLocation}
                 />
               </CardContent>
             </Card>
@@ -148,7 +151,7 @@ export default async function CarDetailsPage({ params, searchParams }: CarDetail
             <div className="mb-8 p-4 bg-gray-100 rounded-lg flex flex-col sm:flex-row justify-between items-center gap-4">
                 <div>
                     <p className="text-3xl font-bold text-primary">
-                        ${car.daily_rate}
+                        {car.daily_rate} MAD
                         <span className="text-lg font-normal text-muted-foreground">/day</span>
                     </p>
                 </div>

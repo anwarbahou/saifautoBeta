@@ -177,7 +177,7 @@ export function CarDetailsModal({
             <DollarSign className="h-5 w-5 text-muted-foreground" />
             <div>
               <p className="text-sm text-muted-foreground">Daily Rate</p>
-              <p className="font-medium">${car.daily_rate.toFixed(2)} / day</p>
+              <p className="font-medium">{car.daily_rate.toFixed(2)} MAD / day</p>
             </div>
           </div>
         </div>

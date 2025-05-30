@@ -3,7 +3,7 @@ import Image from "next/image"
 const cars = [
   {
     name: "Lamborghini Urus",
-    price: "$250/day",
+    price: "250 MAD/day",
     image: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=400&q=80",
     mileage: "12,485 miles",
     fuel: "Petrol",
@@ -12,7 +12,7 @@ const cars = [
   },
   {
     name: "Mercedes G-Class",
-    price: "$220/day",
+    price: "220 MAD/day",
     image: "https://images.unsplash.com/photo-1503736334956-4c8f8e92946d?auto=format&fit=crop&w=400&q=80",
     mileage: "42,670 miles",
     fuel: "Petrol",

@@ -386,8 +386,8 @@ export async function getBookings() {
     .from("bookings")
     .select(`
       *,
-      clients (id, name, email),
-      cars (id, make, model, license_plate)
+      clients (id, first_name, last_name, email, phone),
+      cars (id, make, model, license_plate, daily_rate)
     `)
     .order("start_date", { ascending: false })
 

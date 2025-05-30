@@ -22,7 +22,8 @@ export async function POST(req: NextRequest) {
       .upsert([
         {
           email,
-          name: `${first_name} ${last_name}`,
+          first_name,
+          last_name,
           phone,
         },
       ], { onConflict: 'email' })
@@ -45,6 +46,10 @@ export async function POST(req: NextRequest) {
           pickup_location,
           dropoff_location,
           status: 'Confirmed',
+          first_name,
+          last_name,
+          email,
+          phone,
         },
       ]);
 

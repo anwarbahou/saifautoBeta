@@ -94,8 +94,7 @@ function CarCard({ car, searchParams }: { car: CarData, searchParams: URLSearchP
       <CardFooter className="p-5 bg-gray-50 border-t flex items-center justify-between">
         <div>
           <p className="text-2xl font-bold text-primary">
-            ${car.price_per_day}
-            <span className="text-sm font-normal text-muted-foreground">/day</span>
+            {car.price_per_day} MAD
           </p>
         </div>
         <Button asChild size="default" className="text-base font-semibold">

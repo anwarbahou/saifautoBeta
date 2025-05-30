@@ -32,7 +32,7 @@ export default function NewNavbar() {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-6">
-          <Link href="/fleet" className="text-lg font-medium hover:text-primary">
+          <Link href="/fleet" className="text-sm font-medium hover:text-primary transition-colors">
             Our Fleet
           </Link>
           <Link href="#how-it-works" className="text-sm font-medium hover:text-primary transition-colors">
