@@ -72,16 +72,18 @@ async function fetchCarDetails(id: string): Promise<CarDetailsData | null> {
 }
 
 interface CarDetailsPageProps {
-  params: { id: string };
-  searchParams: SearchParams;
+  params?: Promise<{ id: string }>;
+  searchParams?: Promise<SearchParams>;
 }
 
 export default async function CarDetailsPage({ params, searchParams }: CarDetailsPageProps) {
-  const car = await fetchCarDetails(params.id);
+  const resolvedParams = params ? await params : { id: '' };
+  const resolvedSearchParams = searchParams ? await searchParams : {};
+  const car = await fetchCarDetails(resolvedParams.id);
 
   // Get the dates from URL parameters
-  const pickupDateTime = searchParams.pickupDateTime ? new Date(searchParams.pickupDateTime) : null;
-  const dropoffDateTime = searchParams.dropoffDateTime ? new Date(searchParams.dropoffDateTime) : null;
+  const pickupDateTime = resolvedSearchParams.pickupDateTime ? new Date(resolvedSearchParams.pickupDateTime) : null;
+  const dropoffDateTime = resolvedSearchParams.dropoffDateTime ? new Date(resolvedSearchParams.dropoffDateTime) : null;
 
   if (!car) {
     return (

@@ -7,8 +7,17 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { getRecentBookings } from "@/lib/actions"
 import { useToast } from "@/components/ui/use-toast"
 
+type BookingWithClientAndCar = {
+  id: number;
+  start_date: string;
+  end_date: string;
+  status: string;
+  clients?: { id: number; name: string };
+  cars?: { id: number; make: string; model: string };
+};
+
 export function RecentBookings() {
-  const [bookings, setBookings] = useState([])
+  const [bookings, setBookings] = useState<BookingWithClientAndCar[]>([])
   const [loading, setLoading] = useState(true)
   const { toast } = useToast()
 

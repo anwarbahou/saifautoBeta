@@ -20,7 +20,7 @@ export default function SetupPage() {
       const result = await createAdminUser()
 
       if (result.error) {
-        setMessage({ type: "error", text: result.error })
+        setMessage({ type: "error", text: typeof result.error === "string" ? result.error : result.error?.message || "Unknown error" })
         return
       }
 
