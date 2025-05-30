@@ -85,7 +85,8 @@ export default async function CarDetailsPage({ params, searchParams }: CarDetail
   const pickupDateTime = resolvedSearchParams.pickupDateTime ? new Date(resolvedSearchParams.pickupDateTime) : null;
   const dropoffDateTime = resolvedSearchParams.dropoffDateTime ? new Date(resolvedSearchParams.dropoffDateTime) : null;
 
-  const pickupLocation = resolvedSearchParams.destination || resolvedSearchParams.pickup_location || "";
+  const pickupLocationRaw = resolvedSearchParams.destination || resolvedSearchParams.pickup_location || "";
+  const pickupLocation = Array.isArray(pickupLocationRaw) ? pickupLocationRaw[0] : pickupLocationRaw;
 
   if (!car) {
     return (

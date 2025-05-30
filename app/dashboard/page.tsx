@@ -8,6 +8,10 @@ import { RecentWhatsappMessages } from "@/components/recent-whatsapp-messages"
 import { CarStatusOverview } from "@/components/car-status-overview"
 import { UpcomingBookings } from "@/components/upcoming-bookings"
 
+export const metadata = {
+  title: "Saifauto - Dashboard",
+};
+
 export default function DashboardPage() {
   return (
     <div className="p-8 space-y-8">

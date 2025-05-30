@@ -3,6 +3,10 @@ import { ClientsList } from "@/components/clients-list"
 import { DashboardShell } from "@/components/dashboard-shell"
 import { getClients } from "@/lib/actions"
 
+export const metadata = {
+  title: "Saifauto - Clients",
+};
+
 export default async function ClientsPage() {
   // Fetch initial clients data
   const initialClients = await getClients()
