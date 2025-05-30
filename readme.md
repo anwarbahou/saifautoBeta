@@ -19,3 +19,4 @@ Backend/DB: Supabase
 State & Forms: React Hook Form, Zod
 Charts: Recharts
 Other: Framer Motion, Embla Carousel, Lucide Icons
+ANwar
