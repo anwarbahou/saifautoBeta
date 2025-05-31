@@ -52,7 +52,7 @@ export function Sidebar() {
     { name: "Bookings", href: "/dashboard/bookings", icon: Calendar },
     { name: "WhatsApp", href: "/dashboard/whatsapp", icon: MessageCircle },
     { name: "Calendar", href: "/dashboard/calendar", icon: CalendarDays },
-    { name: "Settings", href: "/dashboard/settings", icon: Settings }
+    { name: "Settings", href: "/dashboard/settings", icon: Settings },
   ]
   
   const handleMouseEnter = () => {

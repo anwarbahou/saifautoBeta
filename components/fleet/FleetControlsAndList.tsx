@@ -70,8 +70,11 @@ const FleetControlsAndList: React.FC<FleetControlsAndListProps> = ({ initialCars
 
   // Build URL with search parameters
   const getCarUrl = (carId: string | number) => {
-    const params = new URLSearchParams(searchParams.toString());
-    return `/cars/${carId}?${params.toString()}`;
+    if (searchParams) {
+      const params = new URLSearchParams(searchParams.toString());
+      return `/cars/${carId}?${params.toString()}`;
+    }
+    return `/cars/${carId}`;
   };
 
   return (

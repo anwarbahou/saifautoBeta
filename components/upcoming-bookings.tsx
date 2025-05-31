@@ -11,12 +11,14 @@ import { getUpcomingBookings } from "@/lib/actions";
 interface UpcomingBooking {
   id: string; // or number
   client_name: string; // This will come from the joined clients table
+  client_first_name?: string; // Added
+  client_last_name?: string;  // Added
   car_model: string;   // This will come from the joined cars table
   car_make: string;    // This will come from the joined cars table
   start_date: string;
   status: string; 
   // Joined data from server action
-  clients: { id: number; name: string; } | null;
+  clients: { id: number; first_name?: string; last_name?: string; } | null;
   cars: { id: number; make: string; model: string; } | null;
 }
 
@@ -36,16 +38,33 @@ export function UpcomingBookings() {
         
         if (result.success && result.data) {
           // Map the data if necessary, or use directly if fields match
-          const mappedBookings: UpcomingBooking[] = result.data.map((dbBooking: any) => ({
-            id: dbBooking.id.toString(),
-            client_name: dbBooking.clients?.name || "N/A",
-            car_make: dbBooking.cars?.make || "N/A",
-            car_model: dbBooking.cars?.model || "N/A",
-            start_date: dbBooking.start_date,
-            status: dbBooking.status,
-            clients: dbBooking.clients, // keep for potential detailed view or future use
-            cars: dbBooking.cars,       // keep for potential detailed view or future use
-          }));
+          const mappedBookings: UpcomingBooking[] = result.data.map((dbBooking: any) => {
+            const calculatedClientName = "Test Name";
+            return {
+              id: dbBooking.id.toString(),
+              client_name: calculatedClientName,
+              client_first_name: dbBooking.clients?.first_name || "N/A",
+              client_last_name: dbBooking.clients?.last_name || "",
+              car_make: dbBooking.cars?.make || "N/A",
+              car_model: dbBooking.cars?.model || "N/A",
+              start_date: dbBooking.start_date,
+              status: dbBooking.status,
+              clients: dbBooking.clients && typeof dbBooking.clients.id === 'number'
+                ? {
+                    id: dbBooking.clients.id,
+                    first_name: dbBooking.clients.first_name,
+                    last_name: dbBooking.clients.last_name
+                  }
+                : null,
+              cars: dbBooking.cars && typeof dbBooking.cars.id === 'number'
+                ? {
+                    id: dbBooking.cars.id,
+                    make: dbBooking.cars.make || "Unknown Make",
+                    model: dbBooking.cars.model || "Unknown Model"
+                  }
+                : null,
+            };
+          });
           setBookings(mappedBookings);
         } else {
           setError(result.error || "Failed to load upcoming bookings.");
@@ -96,7 +115,7 @@ export function UpcomingBookings() {
                 <div className="flex items-center gap-3">
                   <div className="flex-grow min-w-0">
                      <div className="flex justify-between items-baseline">
-                        <h4 className="font-medium truncate text-sm">{booking.client_name}</h4>
+                        <h4 className="font-medium truncate text-sm">{booking.client_first_name} {booking.client_last_name}</h4>
                         <Badge variant={booking.status === "Confirmed" ? "default" : "outline"} className="text-xs">{booking.status}</Badge>
                      </div>
                     <p className="text-xs text-muted-foreground truncate">{booking.car_make} {booking.car_model}</p>

@@ -330,7 +330,7 @@ export async function getClients() {
     // Continue with empty bookings array rather than failing completely
     return clientsData.map(client => ({
       id: client.id,
-      name: client.name,
+      name: `${client.first_name || ''} ${client.last_name || ''}`.trim(),
       email: client.email,
       phone: client.phone,
       join_date: client.created_at,
@@ -367,7 +367,7 @@ export async function getClients() {
 
     return {
       id: client.id,
-      name: client.name,
+      name: `${client.first_name || ''} ${client.last_name || ''}`.trim(),
       email: client.email,
       phone: client.phone,
       join_date: client.created_at,
@@ -464,7 +464,7 @@ export async function getUpcomingBookings(limit = 3): Promise<{ success: boolean
       .from("bookings")
       .select(`
         *,
-        clients (id, name),
+        clients (id, first_name, last_name),
         cars (id, make, model)
       `)
       .gte("start_date", today) // Greater than or equal to today

@@ -15,7 +15,7 @@ interface Car {
   license_plate?: string;
   licensePlate?: string;
   year?: number;
-  color?: string;
+  color?: string | null;
   category?: string;
   features?: string[];
 }

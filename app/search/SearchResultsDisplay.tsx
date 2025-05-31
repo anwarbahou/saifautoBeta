@@ -106,9 +106,9 @@ const SearchResultsDisplay = () => {
   const [cars, setCars] = useState<CarData[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const destination = searchParams.get('destination');
-  const pickupDateTime = searchParams.get('pickupDateTime');
-  const dropoffDateTime = searchParams.get('dropoffDateTime');
+  const destination = searchParams ? searchParams.get('destination') : null;
+  const pickupDateTime = searchParams ? searchParams.get('pickupDateTime') : null;
+  const dropoffDateTime = searchParams ? searchParams.get('dropoffDateTime') : null;
 
   useEffect(() => {
     async function loadCars() {
@@ -143,7 +143,7 @@ const SearchResultsDisplay = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
           {cars.map((car) => (
-            <CarCard key={car.id} car={car} searchParams={searchParams} />
+            searchParams && <CarCard key={car.id} car={car} searchParams={searchParams} />
           ))}
         </div>
       )}

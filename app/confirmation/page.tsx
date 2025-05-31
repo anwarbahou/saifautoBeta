@@ -62,6 +62,8 @@ export default function BookingConfirmation() {
   });
 
   useEffect(() => {
+    if (!searchParams) return;
+
     setBooking({
       bookingId: searchParams.get("bookingId") || undefined,
       user: {
@@ -92,7 +94,7 @@ export default function BookingConfirmation() {
       },
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [searchParams]);
 
   const handlePrint = () => {
     window.print();
