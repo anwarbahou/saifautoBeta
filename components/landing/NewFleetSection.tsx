@@ -112,7 +112,7 @@ export function CarCard({ car }: { car: CarData }) {
       <CardFooter className="p-5 bg-gray-50 border-t flex items-center justify-between">
         <div>
           <p className="text-2xl font-bold text-primary">
-            ${car.price_per_day}
+            {car.price_per_day} MAD
             <span className="text-sm font-normal text-muted-foreground">/day</span>
           </p>
         </div>

@@ -78,15 +78,24 @@ export function RecentWhatsappMessages() {
         {!loading && !error && messages.length > 0 && (
           <div className="space-y-3 pt-2">
             {messages.map((message) => (
-              <Link href={message.link || "/dashboard/whatsapp"} key={message.id} className="block hover:bg-muted/50 p-2.5 rounded-md transition-colors">
-                <div className="flex items-start gap-3">
-                  <div className={`mt-1 h-2.5 w-2.5 rounded-full ${message.unread ? 'bg-primary' : 'bg-muted-foreground/50'} flex-shrink-0`}></div>
+              <Link href={message.link || "/dashboard/whatsapp"} key={message.id} className="block group">
+                <div className="flex items-end gap-2 p-3 rounded-lg transition-colors group-hover:bg-muted/50">
+                  <div className={`flex-shrink-0 h-2.5 w-2.5 rounded-full self-start mt-1.5 ${message.unread ? 'bg-primary' : 'bg-muted-foreground/30'}`}></div>
+                  
                   <div className="flex-grow min-w-0">
-                    <div className="flex justify-between items-baseline">
-                        <h4 className={`font-medium truncate text-sm ${message.unread ? 'text-foreground' : 'text-muted-foreground'}`}>{message.sender}</h4>
-                        <span className={`text-xs whitespace-nowrap ${message.unread ? 'text-primary font-medium' : 'text-muted-foreground'}`}>{message.timestamp}</span>
+                    <div className="flex justify-between items-baseline mb-0.5">
+                      <h4 className={`font-semibold text-sm ${message.unread ? 'text-foreground' : 'text-muted-foreground'}`}>
+                        {message.sender}
+                      </h4>
+                      <span className={`text-xs whitespace-nowrap ${message.unread ? 'text-primary font-medium' : 'text-muted-foreground/80'}`}>
+                        {message.timestamp}
+                      </span>
                     </div>
-                    <p className={`text-xs truncate ${message.unread ? 'text-foreground/90' : 'text-muted-foreground/80'}`}>{message.preview}</p>
+                    <div className={`p-2 rounded-md ${message.unread ? 'bg-primary/10 dark:bg-primary/20' : 'bg-muted/60 dark:bg-muted/40'}`}>
+                       <p className={`text-xs ${message.unread ? 'text-foreground/90' : 'text-muted-foreground'}`}>
+                        {message.preview}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </Link>

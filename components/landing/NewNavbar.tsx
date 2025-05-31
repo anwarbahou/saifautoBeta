@@ -4,6 +4,7 @@ import Link from "next/link"
 import { Menu, X } from "lucide-react"
 import { useState, useEffect } from "react"
 import { usePathname } from "next/navigation"
+import Image from "next/image"
 
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -27,7 +28,14 @@ export default function NewNavbar() {
     <header className={headerClasses}>
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2 font-bold text-xl">
-          <span className="text-primary">Drive</span>Easy
+          <Image 
+            src="/SVG/Asset 1.svg" 
+            alt="Saifauto Logo" 
+            width={30}
+            height={30}
+            className="h-auto"
+          />
+          <span className="font-bold text-xl hidden md:inline">Saifauto</span>
         </Link>
 
         {/* Desktop Navigation */}

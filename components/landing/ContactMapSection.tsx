@@ -26,7 +26,7 @@ export default function ContactMapSection() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-start">
+        <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
           {/* Map Section */}
           <div className="rounded-lg overflow-hidden shadow-xl order-last md:order-first">
             <iframe
