@@ -4,6 +4,7 @@ import { Car, CalendarClock, Users, LayoutDashboard, Settings, LogOut, Search, M
 import { usePathname, useRouter } from "next/navigation"
 import type { User } from "@supabase/supabase-js"
 import React from "react"
+import Image from "next/image"
 
 import {
   Sidebar,
@@ -95,8 +96,14 @@ function DashboardSidebarContent({ user }: DashboardSidebarProps) {
     >
       <SidebarHeader>
         <div className="flex items-center gap-2 px-4 py-2">
-          <Car className="h-6 w-6" />
-          <span className="text-xl font-bold">CarRent</span>
+          <Image 
+            src="/SVG/Asset 1.svg" 
+            alt="CarRent Logo" 
+            width={30}
+            height={30}
+            className="h-auto"
+          />
+          <span className="text-xl font-bold ml-1">CarRent</span>
           <div className="ml-auto">
             <ThemeToggle />
           </div>

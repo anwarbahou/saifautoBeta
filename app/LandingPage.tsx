@@ -7,6 +7,7 @@ import NewFleetSection from "@/components/landing/NewFleetSection";
 import NewFooter from "@/components/landing/NewFooter";
 import NewHowItWorksSection from "@/components/landing/NewHowItWorksSection";
 import NewTestimonialsSection from "@/components/landing/NewTestimonialsSection";
+import ContactMapSection from "@/components/landing/ContactMapSection";
 
 const LandingPage = () => {
   return (
@@ -17,6 +18,7 @@ const LandingPage = () => {
         <NewFleetSection />
         <NewHowItWorksSection />
         <NewTestimonialsSection />
+        <ContactMapSection />
         <NewFAQSection />
         <NewCTASection />
       </main>

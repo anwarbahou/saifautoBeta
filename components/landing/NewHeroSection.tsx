@@ -90,15 +90,10 @@ export default function NewHeroSection() {
             <p className="mb-8 max-w-xl text-lg text-gray-200 sm:text-xl mx-auto lg:mx-0 drop-shadow-sm">
               Discover our premium fleet and enjoy the freedom of the open road with our hassle-free rental service.
             </p>
-            <div className="flex flex-wrap gap-4 justify-center lg:justify-start mb-10 lg:mb-0">
-              <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm p-3 rounded-lg">
-                <Clock className="h-5 w-5 text-primary" />
-                <span className="font-medium">24/7 Support</span>
-              </div>
-              <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm p-3 rounded-lg">
-                <MapPin className="h-5 w-5 text-primary" />
-                <span className="font-medium">100+ Locations</span>
-              </div>
+            <div className="flex justify-center lg:justify-start mb-10 lg:mb-0">
+              <Button asChild size="lg" className="text-lg font-semibold px-8 py-3 bg-primary hover:bg-primary/90 text-primary-foreground">
+                <a href="#contact">Contact Us</a>
+              </Button>
             </div>
           </div>
 

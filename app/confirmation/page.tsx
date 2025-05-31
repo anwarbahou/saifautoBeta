@@ -10,6 +10,7 @@ import {
   Clock,
   CreditCard,
 } from "lucide-react";
+import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
@@ -105,6 +106,15 @@ export default function BookingConfirmation() {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8 print:mb-6">
+          <div className="flex justify-center mt-8 mb-4 print:mb-3 print:mt-4">
+            <Image 
+              src="/SVG/Asset 1.svg" 
+              alt="Saifauto Logo" 
+              width={60}
+              height={60}
+              className="h-auto print:block"
+            />
+          </div>
           <h1 className="text-3xl font-bold text-black mb-2">Booking Confirmed!</h1>
           <p className="text-black">Your car rental has been successfully booked</p>
           {booking.bookingId && (
@@ -124,9 +134,9 @@ export default function BookingConfirmation() {
           </Button>
         </div>
 
-        {/* Details Grid */}
-        <div className="w-full max-w-3xl grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6 items-start">
-          {/* Left: Customer & Booking Info */}
+        {/* Details Grid - Changed to always be single column */}
+        <div className="w-full max-w-3xl mx-auto grid grid-cols-1 gap-x-12 gap-y-8 items-start">
+          {/* Customer & Booking Info will now stack above Vehicle Info */}
           <div className="space-y-4">
             <div>
               <h2 className="text-xl font-bold text-black flex items-center gap-2 mb-2">
@@ -195,7 +205,7 @@ export default function BookingConfirmation() {
         {/* Footer */}
         <div className="mt-8 text-center text-black text-sm print:mt-6">
           <p>Thank you for choosing our car rental service!</p>
-          <p>For any questions or changes, please contact us at support@carrental.com or (555) 123-4567</p>
+          <p>For any questions or changes, please contact us at <a href="mailto:contact@saifauto.ma" className="text-primary hover:underline">contact@saifauto.ma</a> or <a href="tel:+212660513878" className="text-primary hover:underline">+212 660-513878</a></p>
         </div>
       </div>
     </div>

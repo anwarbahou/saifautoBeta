@@ -74,13 +74,13 @@ export default function NewFooter() {
                 <MapPin className="h-5 w-5 text-primary shrink-0 mt-0.5" />
                 <span>123 Rental Street, Car City, CC 12345, United States</span>
               </li>
-              <li className="flex gap-3 items-center">
-                <Phone className="h-5 w-5 text-primary shrink-0" />
-                <a href="tel:+15551234567" className="hover:text-primary transition-colors">+1 (555) 123-4567</a>
+              <li className="flex items-center gap-2">
+                <Phone className="w-4 h-4 text-primary" />
+                <a href="tel:+212660513878" className="hover:text-primary transition-colors">+212 660-513878</a>
               </li>
-              <li className="flex gap-3 items-center">
-                <Mail className="h-5 w-5 text-primary shrink-0" />
-                <a href="mailto:info@driveeasy.com" className="hover:text-primary transition-colors">info@driveeasy.com</a>
+              <li className="flex items-center gap-2">
+                <Mail className="w-4 h-4 text-primary" />
+                <a href="mailto:contact@saifauto.ma" className="hover:text-primary transition-colors">contact@saifauto.ma</a>
               </li>
             </ul>
           </div>

@@ -13,6 +13,7 @@ import {
   Car as CarIcon,
   CalendarDays
 } from "lucide-react"
+import Image from "next/image"
 import { cn } from "@/lib/utils"
 import { createBrowserSupabaseClient } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
@@ -83,8 +84,25 @@ export function Sidebar() {
     >
       <div className={cn("flex h-14 items-center border-b px-4")}>
         <Link href="/" className={cn("flex items-center gap-2 font-semibold", isCollapsed ? "justify-center w-full" : "")}>
-          {!isCollapsed && <span>saifauto</span>}
-          {isCollapsed && <span className="font-semibold text-lg">S</span>}
+          {!isCollapsed && (
+            <Image 
+              src="/SVG/Asset 1.svg" 
+              alt="Saifauto Logo" 
+              width={30}
+              height={30}
+              className="h-auto sidebar-logo"
+            />
+          )}
+          {!isCollapsed && <span className="text-lg font-semibold ml-2">Saifauto</span>}
+          {isCollapsed && (
+            <Image 
+              src="/SVG/Asset 1.svg" 
+              alt="Saifauto Logo Collapsed" 
+              width={24}
+              height={24}
+              className="h-auto sidebar-logo"
+            />
+          )}
         </Link>
         
         <div className={cn("flex items-center gap-1", isCollapsed ? "hidden" : "ml-auto")}>
@@ -141,6 +159,14 @@ export function Sidebar() {
           {!isCollapsed && <span>Sign Out</span>}
         </button>
       </div>
+      <style jsx global>{`
+        html.light .sidebar-logo {
+          filter: none;
+        }
+        html.dark .sidebar-logo {
+          filter: brightness(0) invert(1);
+        }
+      `}</style>
     </div>
   )
 } 

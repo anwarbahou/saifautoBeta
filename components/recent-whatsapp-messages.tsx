@@ -5,8 +5,7 @@ import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { AlertTriangle, Loader2, MessageSquare, ArrowRight } from "lucide-react";
-
-// Later, replace with a call to a server action: import { getRecentWhatsappMessages } from "@/lib/actions";
+import { getRecentWhatsappMessages } from "@/lib/actions";
 
 interface Message {
   id: string;
@@ -17,54 +16,34 @@ interface Message {
   link?: string; // Optional link to the full conversation
 }
 
-// Mock data similar to app/dashboard/whatsapp/page.tsx
-const mockMessages: Message[] = [
-  {
-    id: "1",
-    sender: "John Doe",
-    preview: "Confirming my booking for the Toyota Camry next week.",
-    timestamp: "11:45 AM",
-    unread: true,
-    link: "/dashboard/whatsapp?chatId=1"
-  },
-  {
-    id: "2",
-    sender: "Alice Wonderland",
-    preview: "Is the Ford Explorer available from August 10th to 15th?",
-    timestamp: "Yesterday",
-    unread: false,
-    link: "/dashboard/whatsapp?chatId=2"
-  },
-  {
-    id: "3",
-    sender: "Support Bot",
-    preview: "Your payment for booking #7890 has been processed successfully.",
-    timestamp: "2 days ago",
-    unread: false,
-  },
-  {
-    id: "4",
-    sender: "Bob The Builder",
-    preview: "Quick question about the insurance options provided.",
-    timestamp: "3 days ago",
-    unread: true,
-    link: "/dashboard/whatsapp?chatId=4"
-  },
-];
-
 export function RecentWhatsappMessages() {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [loading, setLoading] = useState(true); // Simulate loading
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Simulate fetching data
-    const timer = setTimeout(() => {
-      // const fetchedMessages = await getRecentWhatsappMessages(4); // Example future action
-      setMessages(mockMessages.slice(0, 4)); // Show 4 messages
-      setLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
+    async function fetchMessages() {
+      setLoading(true);
+      setError(null);
+      try {
+        const fetchedMessages = await getRecentWhatsappMessages(4); // Fetch 4 messages
+        if (fetchedMessages && Array.isArray(fetchedMessages)) { // Basic check
+          setMessages(fetchedMessages);
+        } else {
+          // This case might indicate an issue with the action's return type or an unexpected response
+          console.warn("getRecentWhatsappMessages returned an unexpected value:", fetchedMessages);
+          setMessages([]); // Default to empty array
+        }
+      } catch (err: any) {
+        console.error("Error fetching recent WhatsApp messages:", err);
+        setError(err.message || "Failed to load messages.");
+        setMessages([]); // Clear messages on error
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchMessages();
   }, []);
 
   return (

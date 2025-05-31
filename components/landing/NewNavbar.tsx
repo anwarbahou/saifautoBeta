@@ -47,6 +47,9 @@ export default function NewNavbar() {
           <Link href="#faq" className="text-sm font-medium hover:text-primary transition-colors">
             FAQ
           </Link>
+          <Link href="#contact" className="text-sm font-medium hover:text-primary transition-colors">
+            Contact Us
+          </Link>
         </nav>
 
         <div className="hidden md:flex items-center gap-4">
@@ -103,6 +106,9 @@ export default function NewNavbar() {
           </Link>
           <Link href="#faq" className="text-lg font-medium hover:text-primary" onClick={() => setIsMenuOpen(false)}>
             FAQ
+          </Link>
+          <Link href="#contact" className="text-lg font-medium hover:text-primary" onClick={() => setIsMenuOpen(false)}>
+            Contact Us
           </Link>
           <div className="mt-6 flex flex-col gap-4">
             {/* <Link

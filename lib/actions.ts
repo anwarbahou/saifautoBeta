@@ -4,6 +4,7 @@ import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 // Import createClient from the regular supabase-js SDK
 import { createClient } from '@supabase/supabase-js'
+import twilio from 'twilio'; // Added twilio import
 
 // This function remains for other actions that might use it successfully
 export async function createServerSupabaseClient() {
@@ -384,43 +385,107 @@ export async function getClients() {
 }
 
 // Bookings actions
-export async function getBookings() {
-  const supabase = await createServerSupabaseClient()
-  const { data, error } = await supabase
+export async function getBookings(startDate?: string, endDate?: string) {
+  const supabase = await createServerSupabaseClient();
+  let query = supabase
     .from("bookings")
     .select(`
       *,
       clients (id, first_name, last_name, email, phone),
       cars (id, make, model, license_plate, daily_rate)
     `)
-    .order("start_date", { ascending: false })
+    .order("start_date", { ascending: false });
 
-  if (error) {
-    console.error("Error fetching bookings:", error)
-    return []
+  // Apply date filters if provided
+  // Ensure your start_date and end_date columns in Supabase are of a comparable type (e.g., timestamp, date)
+  if (startDate) {
+    query = query.gte("start_date", startDate);
+  }
+  if (endDate) {
+    // For end_date, common practice is to filter where booking start_date <= selectedEndDate
+    // or booking end_date >= selectedStartDate AND booking start_date <= selectedEndDate
+    // For simplicity here, we'll filter if the booking *starts* before or on the endDate.
+    // You might need a more complex range query depending on how you define "within a range".
+    // e.g., bookings that *overlap* with the range.
+    // For now, this filters bookings that start within the given month/week/day view.
+    query = query.lte("start_date", endDate);
   }
 
-  return data
+  const { data, error } = await query;
+
+  if (error) {
+    console.error("Error fetching bookings:", error);
+    return [];
+  }
+
+  // Process data to add a 'name' field to each client object, if not already present
+  const processedData = data?.map(booking => {
+    let clientName = null;
+    if (booking.clients) {
+      if (booking.clients.name) { // if name field directly exists
+        clientName = booking.clients.name;
+      } else if (booking.clients.first_name || booking.clients.last_name) { // construct from parts
+        const firstName = booking.clients.first_name || '';
+        const lastName = booking.clients.last_name || '';
+        clientName = `${firstName} ${lastName}`.trim();
+      }
+    }
+
+    return {
+      ...booking,
+      clients: booking.clients
+        ? {
+            ...booking.clients, // spread existing client fields
+            name: clientName || "Unknown Client"
+          }
+        : null
+    };
+  });
+
+  return processedData || [];
 }
 
 export async function getRecentBookings(limit = 5) {
-  const supabase = await createServerSupabaseClient()
+  const supabase = await createServerSupabaseClient();
   const { data, error } = await supabase
     .from("bookings")
     .select(`
       *,
-      clients (id, name),
+      clients (id, first_name, last_name),
       cars (id, make, model)
     `)
     .order("created_at", { ascending: false })
-    .limit(limit)
+    .limit(limit);
 
   if (error) {
-    console.error("Error fetching recent bookings:", error)
-    return []
+    console.error("Error fetching recent bookings:", error);
+    return [];
   }
 
-  return data
+  // Process data to add a 'name' field to each client object
+  const processedData = data?.map(booking => {
+    // Ensure clients object exists and has first_name/last_name before creating name
+    let clientName = null;
+    if (booking.clients) {
+      const firstName = booking.clients.first_name || '';
+      const lastName = booking.clients.last_name || '';
+      clientName = `${firstName} ${lastName}`.trim();
+    }
+
+    return {
+      ...booking,
+      clients: booking.clients
+        ? {
+            id: booking.clients.id, // Keep existing id
+            first_name: booking.clients.first_name, // Keep original fields if needed elsewhere
+            last_name: booking.clients.last_name,
+            name: clientName || "Unknown Client" // Construct the name field
+          }
+        : null // Handle cases where booking.clients might be null
+    };
+  });
+
+  return processedData || [];
 }
 
 // Action to get car counts by status for pie chart widget
@@ -497,13 +562,75 @@ export async function getDashboardStats() {
 }
 
 export async function deleteClient(id: number): Promise<{ success: boolean; error?: string }> {
-  const supabaseAdmin = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
-  const { error } = await supabaseAdmin.from("clients").delete().eq("id", id);
+  const supabase = await createServerSupabaseClient()
+  const { error } = await supabase.from("clients").delete().eq("id", id)
+
   if (error) {
-    return { success: false, error: error.message };
+    console.error("Error deleting client:", error)
+    return { success: false, error: error.message }
   }
-  return { success: true };
+
+  return { success: true }
 }
+
+// Placeholder for getRecentWhatsappMessages
+// TODO: Implement actual logic to fetch WhatsApp messages
+interface RecentMessage {
+  id: string;
+  sender: string; // For inbound, this will be the user's number. For outbound, your Twilio number.
+  preview: string; // Body of the message
+  timestamp: string; // dateSent
+  unread: boolean; // This might need custom logic based on your app's read tracking, Twilio doesn't directly provide this for all cases.
+  link?: string; // Optional link to the full conversation
+}
+
+export async function getRecentWhatsappMessages(limit: number = 4): Promise<RecentMessage[]> {
+  const twilioAccountSid = process.env.TWILIO_ACCOUNT_SID;
+  const twilioAuthToken = process.env.TWILIO_AUTH_TOKEN;
+  // const twilioWhatsAppFromNumber = process.env.TWILIO_WHATSAPP_FROM; // Your Twilio WhatsApp number
+
+  if (!twilioAccountSid || !twilioAuthToken) { // Removed twilioWhatsAppFromNumber check for now, as we want all messages for the widget
+    console.error('Missing Twilio environment variables (TWILIO_ACCOUNT_SID or TWILIO_AUTH_TOKEN).');
+    // Return empty or throw error, depending on desired behavior for the component
+    return []; 
+  }
+
+  const twilioClient = twilio(twilioAccountSid, twilioAuthToken);
+
+  try {
+    // Fetch a bit more than limit in case some are filtered out or to have a small buffer
+    // Twilio's list returns most recent first by default.
+    const messages = await twilioClient.messages.list({ limit: limit + 5 });
+
+    // Transform Twilio messages to RecentMessage format
+    // For the widget, we might want to show both incoming and outgoing messages.
+    // The 'sender' will be the 'from' field. 'unread' is tricky as Twilio's read status is mostly for outbound messages sent via templates.
+    // We'll default 'unread' to false for simplicity in this widget, or true for inbound messages if that's more useful.
+    const formattedMessages: RecentMessage[] = messages.map(msg => ({
+      id: msg.sid,
+      // If it's an inbound message, sender is msg.from. If outbound, sender could be considered msg.to or a generic name.
+      // For simplicity, let's use msg.from for sender display for now.
+      sender: msg.direction === 'inbound' ? msg.from : msg.to, // Or msg.from if you want to always show the other party
+      preview: msg.body,
+      timestamp: new Date(msg.dateSent).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }), // Simple time string
+      unread: msg.direction === 'inbound', // Example: consider inbound messages as unread by default for the widget
+      link: `/dashboard/whatsapp?chatId=${msg.sid}` // Link to a more detailed view if available
+    })); 
+
+    return formattedMessages.slice(0, limit); // Ensure we return only the requested number of messages
+
+  } catch (error: any) {
+    console.error('Error fetching Twilio messages for RecentWhatsappMessages:', error);
+    // Check if it's a Twilio-specific error and handle accordingly, or a general error
+    let errorMessage = 'Failed to fetch recent WhatsApp messages.';
+    if (error && error.message) {
+        errorMessage = error.message;
+    }
+    // It might be better to throw an error here to be caught by the component's try-catch
+    // throw new Error(errorMessage);
+    // Or return empty array if the component is designed to handle that gracefully:
+    return [];
+  }
+}
+
+// Ensure you have your Twilio or other WhatsApp service integration logic here
