@@ -16,7 +16,7 @@ interface CarDetailsData {
   model: string;
   name: string;
   type: string;
-  year: number | null;
+  year: number | undefined;
   color: string | null;
   daily_rate: number;
   image_url: string;
@@ -55,10 +55,10 @@ async function fetchCarDetails(id: string): Promise<CarDetailsData | null> {
       model: car_data.model || "Unknown Model",
       name: `${car_data.make || ''} ${car_data.model || ''}`.trim() || "Unknown Car",
       type: car_data.category || "N/A",
-      year: car_data.year,
+      year: car_data.year ?? undefined,
       color: car_data.color,
       daily_rate: car_data.daily_rate || 0,
-      image_url: car_data.primary_image || "/img/cars/car-placeholder.png",
+      image_url: car_data.primary_image,
       images: car_data.images,
       seats: null, // Explicitly null as not fetched
       fuel_type: null, // Explicitly null as not fetched

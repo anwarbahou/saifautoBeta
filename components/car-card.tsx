@@ -102,7 +102,7 @@ export function CarCard({ car, onEdit, onDelete, onPreview }: CarCardProps) {
                       aria-label={`Preview ${car.make} ${car.model}`}
                     >
                       <Image
-                        src={imageSrc}
+                        src={imageSrc || "/img/cars/car-placeholder.png"}
                         alt={`${car.make} ${car.model} image ${index + 1}`}
                         fill
                         className="object-cover transition-transform duration-300 group-hover/image:scale-105"
@@ -129,7 +129,7 @@ export function CarCard({ car, onEdit, onDelete, onPreview }: CarCardProps) {
               aria-label={`Preview ${car.make} ${car.model}`}
             >
               <Image
-                src={uniqueDisplayImages[0]}
+                src={uniqueDisplayImages[0] || "/img/cars/car-placeholder.png"}
                 alt={`${car.make} ${car.model}`}
                 fill
                 className="object-cover transition-transform duration-300 group-hover/image:scale-105"

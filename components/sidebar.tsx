@@ -10,7 +10,8 @@ import {
   MessageCircle,
   Settings,
   PanelLeftClose,
-  Car as CarIcon
+  Car as CarIcon,
+  CalendarDays
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { createBrowserSupabaseClient } from "@/lib/supabase"
@@ -50,6 +51,7 @@ export function Sidebar() {
     { name: "Clients", href: "/dashboard/clients", icon: Users },
     { name: "Bookings", href: "/dashboard/bookings", icon: Calendar },
     { name: "WhatsApp", href: "/dashboard/whatsapp", icon: MessageCircle },
+    { name: "Calendar", href: "/dashboard/calendar", icon: CalendarDays },
     { name: "Settings", href: "/dashboard/settings", icon: Settings }
   ]
   

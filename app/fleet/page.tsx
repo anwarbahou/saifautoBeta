@@ -48,7 +48,7 @@ async function fetchAllCars(): Promise<CarData[]> {
       name: `${car_item.make || ''} ${car_item.model || ''}`.trim() || "Unknown Car",
       type: car_item.category || "N/A",
       price_per_day: car_item.daily_rate || 0,
-      image_url: car_item.primary_image || "/img/cars/car-placeholder.png",
+      image_url: car_item.primary_image,
       seats: null, 
       fuel_type: null, 
       transmission: null, 
@@ -74,4 +74,8 @@ export default async function FleetPage() {
       <NewFooter />
     </div>
   );
-} 
+}
+
+export const metadata = {
+  title: "Saifauto - Our Fleet",
+}; 

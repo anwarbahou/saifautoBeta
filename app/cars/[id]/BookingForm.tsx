@@ -14,6 +14,10 @@ interface Car {
   model: string;
   license_plate?: string;
   licensePlate?: string;
+  year?: number;
+  color?: string;
+  category?: string;
+  features?: string[];
 }
 
 interface BookingFormProps {
@@ -98,118 +102,78 @@ const BookingForm = ({ car, initialPickupDate = "", initialReturnDate = "", init
         return;
       }
 
-      console.log("Creating client with data:", {
-        name: `${form.firstName} ${form.lastName}`,
-        email: form.email,
-        phone: form.phone,
+      // Send booking data to API route
+      const response = await fetch('/api/bookings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          first_name: form.firstName,
+          last_name: form.lastName,
+          email: form.email,
+          phone: form.phone,
+          pickup_location: form.pickupLocation,
+          dropoff_location: '', // Add dropoff if you have it
+          start_date: form.pickupDate,
+          end_date: form.returnDate,
+          car_id: car.id,
+        }),
       });
 
-      // 1. First try to get existing client
-      const { data: existingClient, error: fetchError } = await supabase
-        .from("clients")
-        .select()
-        .eq('email', form.email)
-        .single();
-
-      let clientId;
-
-      if (fetchError && fetchError.code !== 'PGRST116') { // PGRST116 means no rows returned
-        console.error("Error checking for existing client:", fetchError);
-        setError(`Failed to check existing client: ${fetchError.message || 'Unknown error'}`);
+      const result = await response.json();
+      if (!response.ok) {
+        setError(result.error || 'Booking failed');
         setLoading(false);
         return;
       }
-
-      if (existingClient) {
-        // Update existing client
-        const { error: updateError } = await supabase
-          .from("clients")
-          .update({
-            first_name: form.firstName,
-            last_name: form.lastName,
-            phone: form.phone,
-          })
-          .eq('email', form.email)
-          .select();
-
-        if (updateError) {
-          console.error("Error updating existing client:", JSON.stringify(updateError, null, 2));
-          setError(`Failed to update client profile: ${updateError.message || 'Unknown error'}`);
-          setLoading(false);
-          return;
-        }
-        clientId = existingClient.id;
-      } else {
-        // Create new client
-        const { data: newClient, error: insertError } = await supabase
-          .from("clients")
-          .insert({
-            first_name: form.firstName,
-            last_name: form.lastName,
-            email: form.email,
-            phone: form.phone,
-          })
-          .select()
-          .single();
-
-        if (insertError) {
-          console.error("Error creating new client:", insertError);
-          setError(`Failed to create client profile: ${insertError.message || 'Unknown error'}`);
-          setLoading(false);
-          return;
-        }
-        clientId = newClient.id;
-      }
-
-      if (!clientId) {
-        console.error("No client ID available after operation");
-        setError("Failed to process client information");
-        setLoading(false);
-        return;
-      }
-
-      console.log("Client processed successfully, ID:", clientId);
-
-      // Calculate total price based on number of days and daily rate
-      const days = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
-      const totalPrice = days * car.daily_rate;
-
-      // 2. Create booking with correct schema
-      const bookingData = {
-        car_id: car.id,
-        client_id: clientId,
-        start_date: form.pickupDate,
-        end_date: form.returnDate,
-        total_price: totalPrice,
-        status: "Confirmed",
-        first_name: form.firstName,
-        last_name: form.lastName,
-        email: form.email,
-        phone: form.phone,
-        car_make: car.make,
-        car_model: car.model,
-        car_license_plate: car.license_plate || car.licensePlate || "",
-        pickup_location: form.pickupLocation,
-      };
-
-      console.log("Creating booking with data:", bookingData);
-
-      const { data: booking, error: bookingError } = await supabase
-        .from("bookings")
-        .insert([bookingData])
-        .select();
-
-      if (bookingError) {
-        console.error("Booking creation error:", bookingError);
-        setError(`Failed to create booking: ${bookingError.message || 'Unknown error'}`);
-        setLoading(false);
-        return;
-      }
-
-      console.log("Booking created successfully:", booking);
 
       setSuccess(true);
       toast.success("Booking request sent successfully!");
+
+      // ---- START: Added Twilio Notification ----
+      try {
+        const fullName = `${form.firstName} ${form.lastName}`.trim();
+        const serviceType = car.category || car.name || "Not specified"; // Fallback for serviceType
+
+        const twilioResponse = await fetch('/api/sendBooking', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: fullName,
+            phone: form.phone,
+            bookingDate: form.pickupDate, // This is already in YYYY-MM-DD string format from the form
+            returnDate: form.returnDate, // Added returnDate
+            serviceType: serviceType,
+          }),
+        });
+
+        if (twilioResponse.ok) {
+          try {
+            const twilioResult = await twilioResponse.json();
+            console.log('Twilio message sent successfully:', twilioResult.sid);
+          } catch (jsonError) {
+            console.error('Failed to parse successful Twilio JSON response:', jsonError);
+            const responseText = await twilioResponse.text(); // Get text for successful but non-JSON response
+            console.error('Raw successful Twilio response text:', responseText);
+          }
+        } else {
+          const responseText = await twilioResponse.text(); // Get raw text first
+          console.error('Failed to send Twilio message. Status:', twilioResponse.status, 'Raw Response Text:', responseText);
+          try {
+            const twilioErrorResult = JSON.parse(responseText); // Attempt to parse if it might be JSON despite error status
+            console.error('Parsed Twilio error from response text:', twilioErrorResult.error);
+          } catch (parseError) {
+            console.error('Failed to parse Twilio error response text as JSON. It was likely HTML.');
+          }
+          // Optional: Show a non-blocking toast for Twilio failure
+          // toast.error("Notification could not be sent, but your booking is confirmed.");
+        }
+      } catch (twilioError) {
+        console.error('Error sending Twilio message:', twilioError);
+        // Optional: Show a non-blocking toast for Twilio failure
+        // toast.error("Notification could not be sent due to an unexpected error, but your booking is confirmed.");
+      }
+      // ---- END: Added Twilio Notification ----
+
       setForm({
         firstName: "",
         lastName: "",
@@ -219,7 +183,26 @@ const BookingForm = ({ car, initialPickupDate = "", initialReturnDate = "", init
         returnDate: "",
         pickupLocation: "",
       });
-      router.refresh();
+      // Redirect to confirmation page with booking details
+      const params = new URLSearchParams({
+        car: `${car.make} ${car.model}`,
+        carMake: car.make || '',
+        carModel: car.model || '',
+        carYear: car.year ? String(car.year) : '',
+        carColor: car.color || '',
+        carLicensePlate: car.license_plate || car.licensePlate || '',
+        carCategory: car.category || '',
+        carFeatures: Array.isArray(car.features) ? car.features.join(',') : '',
+        pickupDate: form.pickupDate,
+        returnDate: form.returnDate,
+        pickupLocation: form.pickupLocation,
+        totalPrice: '', // You can recalculate if needed
+        firstName: form.firstName,
+        lastName: form.lastName,
+        email: form.email,
+        phone: form.phone,
+      });
+      router.push(`/confirmation?${params.toString()}`);
     } catch (err) {
       console.error("Unexpected error:", err);
       setError(`An unexpected error occurred: ${err instanceof Error ? err.message : 'Unknown error'}`);

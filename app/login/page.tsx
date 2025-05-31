@@ -11,6 +11,7 @@ import { useRouter } from 'next/navigation'
 import Particles, { initParticlesEngine } from "@tsparticles/react";
 import { loadSlim } from "@tsparticles/slim";
 import type { Container, ISourceOptions } from "@tsparticles/engine";
+import Head from "next/head";
 
 export default function LoginPage() {
   const [isMounted, setIsMounted] = useState(false)
@@ -131,12 +132,46 @@ export default function LoginPage() {
 
   if (!isMounted || !init) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-muted/40">
+      <>
+        <Head>
+          <title>Saifauto - Login</title>
+        </Head>
+        <div className="flex min-h-screen items-center justify-center bg-muted/40">
+          {init && (
+            <Particles
+              id="tsparticles-loading"
+              particlesLoaded={particlesLoaded}
+              options={particleOptions}
+            />
+          )}
+          <Card className="w-full max-w-md z-10">
+            <CardHeader className="space-y-2 text-center">
+              <div className="flex justify-center">
+                <div className="rounded-full bg-blue-600 p-2">
+                  <Car className="h-6 w-6 text-white" />
+                </div>
+              </div>
+              <CardTitle className="text-2xl">Welcome back Imad!</CardTitle>
+              <CardDescription>Loading...</CardDescription>
+            </CardHeader>
+          </Card>
+        </div>
+      </>
+    )
+  }
+
+  return (
+    <>
+      <Head>
+        <title>Saifauto - Login</title>
+      </Head>
+      <div className="flex min-h-screen items-center justify-center bg-muted/40 relative">
         {init && (
           <Particles
-            id="tsparticles-loading"
+            id="tsparticles-main"
             particlesLoaded={particlesLoaded}
             options={particleOptions}
+            className="absolute top-0 left-0 w-full h-full z-0"
           />
         )}
         <Card className="w-full max-w-md z-10">
@@ -147,67 +182,43 @@ export default function LoginPage() {
               </div>
             </div>
             <CardTitle className="text-2xl">Welcome back Imad!</CardTitle>
-            <CardDescription>Loading...</CardDescription>
+            <CardDescription>Enter your credentials to access the dashboard</CardDescription>
           </CardHeader>
-        </Card>
-      </div>
-    )
-  }
-
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-muted/40 relative">
-      {init && (
-        <Particles
-          id="tsparticles-main"
-          particlesLoaded={particlesLoaded}
-          options={particleOptions}
-          className="absolute top-0 left-0 w-full h-full z-0"
-        />
-      )}
-      <Card className="w-full max-w-md z-10">
-        <CardHeader className="space-y-2 text-center">
-          <div className="flex justify-center">
-            <div className="rounded-full bg-blue-600 p-2">
-              <Car className="h-6 w-6 text-white" />
-            </div>
-          </div>
-          <CardTitle className="text-2xl">Welcome back Imad!</CardTitle>
-          <CardDescription>Enter your credentials to access the dashboard</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className={styles.authContainer}>
-            <Auth
-              supabaseClient={supabase}
-              appearance={{
-                theme: ThemeSupa,
-                variables: {
-                  default: {
-                    colors: {
-                      brand: 'hsl(var(--primary))',
-                      brandAccent: 'hsl(var(--primary-foreground))',
-                      brandButtonText: 'hsl(var(--primary-foreground))',
-                      inputBackground: 'hsl(var(--background))',
-                      inputText: 'hsl(var(--foreground))',
-                      inputBorder: 'hsl(var(--border))',
-                      inputBorderFocus: 'hsl(var(--ring))',
-                      inputBorderHover: 'hsl(var(--border))',
+          <CardContent>
+            <div className={styles.authContainer}>
+              <Auth
+                supabaseClient={supabase}
+                appearance={{
+                  theme: ThemeSupa,
+                  variables: {
+                    default: {
+                      colors: {
+                        brand: 'hsl(var(--primary))',
+                        brandAccent: 'hsl(var(--primary-foreground))',
+                        brandButtonText: 'hsl(var(--primary-foreground))',
+                        inputBackground: 'hsl(var(--background))',
+                        inputText: 'hsl(var(--foreground))',
+                        inputBorder: 'hsl(var(--border))',
+                        inputBorderFocus: 'hsl(var(--ring))',
+                        inputBorderHover: 'hsl(var(--border))',
+                      },
                     },
                   },
-                },
-                className: {
-                  input: 'supabase-ui-auth_ui-input',
-                  button: 'supabase-ui-auth_ui-button',
-                  label: 'supabase-ui-auth_ui-label',
-                  anchor: 'supabase-ui-auth_ui-anchor',
-                },
-              }}
-              providers={[]}
-              showLinks={false}
-              redirectTo={origin ? `${origin}/` : undefined}
-            />
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+                  className: {
+                    input: 'supabase-ui-auth_ui-input',
+                    button: 'supabase-ui-auth_ui-button',
+                    label: 'supabase-ui-auth_ui-label',
+                    anchor: 'supabase-ui-auth_ui-anchor',
+                  },
+                }}
+                providers={[]}
+                showLinks={false}
+                redirectTo={origin ? `${origin}/` : undefined}
+              />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </>
   )
 }

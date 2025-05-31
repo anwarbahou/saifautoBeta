@@ -357,7 +357,11 @@ export async function getClients() {
     const bookings = bookingsByClient[client.id] || []
     const activeBookings = bookings.filter((b: Booking) => b.status === 'Active' || b.status === 'Confirmed')
     const completedBookings = bookings.filter((b: Booking) => b.status === 'Completed')
-    const totalSpent = bookings.reduce((sum: number, b: Booking) => sum + (parseFloat(b.total_price.toString()) || 0), 0)
+    // Safely handle total_price if it might be null or undefined
+    const totalSpent = bookings.reduce((sum: number, b: Booking) => {
+      const price = b.total_price !== null && b.total_price !== undefined ? parseFloat(b.total_price.toString()) : 0;
+      return sum + (price || 0);
+    }, 0)
     const lastBooking = bookings.length > 0 ? 
       bookings.sort((a: Booking, b: Booking) => new Date(b.start_date).getTime() - new Date(a.start_date).getTime())[0] : null
 

@@ -109,7 +109,7 @@ export function CarDetailsModal({
                 <CarouselItem key={index}>
                   <div className="aspect-[16/9] w-full relative overflow-hidden rounded-md bg-muted">
                     <Image
-                      src={imageSrc}
+                      src={imageSrc || "/img/cars/car-placeholder.png"}
                       alt={`${car.make} ${car.model} image ${index + 1}`}
                       fill
                       className="object-contain"

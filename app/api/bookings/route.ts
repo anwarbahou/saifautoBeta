@@ -4,6 +4,7 @@ import { supabase } from '@/lib/supabaseClient';
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
+    console.log('[BOOKING API] Received booking request:', body);
     const {
       first_name,
       last_name,
@@ -31,8 +32,10 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (clientError || !client) {
+      console.error('[BOOKING API] Client upsert error:', clientError);
       return NextResponse.json({ error: clientError?.message || 'Failed to create/find client.' }, { status: 500 });
     }
+    console.log('[BOOKING API] Client upserted/found:', client);
 
     // 2. Insert booking
     const { error: bookingError } = await supabase
@@ -54,11 +57,14 @@ export async function POST(req: NextRequest) {
       ]);
 
     if (bookingError) {
+      console.error('[BOOKING API] Booking insert error:', bookingError);
       return NextResponse.json({ error: bookingError.message }, { status: 500 });
     }
+    console.log('[BOOKING API] Booking inserted for client:', client.id);
 
     return NextResponse.json({ success: true });
   } catch (e: any) {
+    console.error('[BOOKING API] Unexpected error:', e);
     return NextResponse.json({ error: e.message || 'Unknown error' }, { status: 500 });
   }
 } 

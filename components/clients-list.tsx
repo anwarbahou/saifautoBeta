@@ -94,12 +94,13 @@ export function ClientsList({ initialClients }: ClientsListProps) {
   };
 
   const filteredClients = clients.filter((client) => {
+    const lowerSearchTerm = searchTerm.toLowerCase();
     const matchesSearch = 
-      client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      client.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (client.name?.toLowerCase() || "").includes(lowerSearchTerm) ||
+      (client.email?.toLowerCase() || "").includes(lowerSearchTerm) ||
       (client.phone && client.phone.includes(searchTerm))
     
-    const matchesStatus = statusFilter === "all" || client.status === statusFilter
+    const matchesStatus = statusFilter === "all" || (client.status?.toLowerCase() || "") === (statusFilter?.toLowerCase() || "");
     const matchesBookings = client.total_bookings >= bookingsRange[0] && client.total_bookings <= bookingsRange[1]
     const matchesSpent = client.total_spent >= spentRange[0] && client.total_spent <= spentRange[1]
 

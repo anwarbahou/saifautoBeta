@@ -55,7 +55,7 @@ async function fetchCarsFromDB(): Promise<CarData[]> {
       model: car_item.model,
       type: car_item.category || "N/A",
       price_per_day: car_item.daily_rate || 0,
-      image_url: car_item.primary_image || "/img/cars/car-placeholder.png", // Provide a fallback
+      image_url: car_item.primary_image, // Use only Supabase URL, no default placeholder
       seats: null, // Placeholder as it's not in the DB
       fuel_type: null, // Placeholder as it's not in the DB
       transmission: null, // Placeholder as it's not in the DB
@@ -70,7 +70,9 @@ async function fetchCarsFromDB(): Promise<CarData[]> {
 
 export function CarCard({ car }: { car: CarData }) {
   const searchParams = useSearchParams();
-  const carUrl = `/cars/${car.id}?${searchParams.toString()}`;
+  // Ensure searchParams is not null before calling toString()
+  const queryString = searchParams ? searchParams.toString() : "";
+  const carUrl = `/cars/${car.id}${queryString ? `?${queryString}` : ""}`;
 
   return (
     <Card className="flex flex-col overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 bg-white">
@@ -169,7 +171,8 @@ export default function NewFleetSection() {
 
         <div className="mt-12 md:mt-16 text-center">
           <Button asChild size="lg" className="text-lg font-semibold px-8 py-3">
-            <Link href={`/fleet?${searchParams.toString()}`}>View All Cars</Link>
+            {/* Ensure searchParams is not null before calling toString() */}
+            <Link href={`/fleet${searchParams ? `?${searchParams.toString()}` : ""}`}>View All Cars</Link>
           </Button>
         </div>
       </div>

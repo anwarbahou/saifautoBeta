@@ -1,8 +1,11 @@
 "use client"
-import { StagewiseToolbar } from "@stagewise/toolbar-next"
+
+import { StagewiseToolbar } from '@stagewise/toolbar-next'
 
 const stagewiseConfig = { plugins: [] }
 
-export const StagewiseToolbarClient = () => (
-  <StagewiseToolbar config={stagewiseConfig} />
-) 
+const StagewiseToolbarClient = () => {
+  return <StagewiseToolbar config={stagewiseConfig} />
+}
+
+export default StagewiseToolbarClient 
