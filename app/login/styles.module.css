@@ -3,6 +3,15 @@
   width: 100%;
 }
 
+.authContainer :global(.supabase-ui-auth_ui-input),
+.authContainer :global(.supabase-ui-auth_ui-button),
+.authContainer :global(.supabase-ui-auth_ui-label),
+.authContainer :global(.supabase-ui-auth_ui-anchor) {
+  /* Add any specific overrides here if needed later */
+  /* For example, to ensure full width for inputs/buttons if not already: */
+  /* width: 100%; */
+}
+
 .authContainer :global(.supabase-ui-auth_ui-input) {
   background-color: hsl(var(--background)) !important;
   color: hsl(var(--foreground)) !important;
@@ -41,4 +50,8 @@
 
 .authContainer :global(.supabase-ui-auth_ui-anchor:hover) {
   color: hsl(221.2 83.2% 46.3%) !important;
+}
+
+.loginLogo {
+  filter: brightness(0) invert(1);
 } 

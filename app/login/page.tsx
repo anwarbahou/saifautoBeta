@@ -4,7 +4,7 @@ import { Auth } from '@supabase/auth-ui-react'
 import { ThemeSupa } from '@supabase/auth-ui-shared'
 import { createBrowserSupabaseClient } from '@/lib/supabase'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Car } from "lucide-react"
+import Image from 'next/image'
 import styles from "./styles.module.css"
 import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
@@ -147,9 +147,7 @@ export default function LoginPage() {
           <Card className="w-full max-w-md z-10">
             <CardHeader className="space-y-2 text-center">
               <div className="flex justify-center">
-                <div className="rounded-full bg-blue-600 p-2">
-                  <Car className="h-6 w-6 text-white" />
-                </div>
+                <Image src="/SVG/Asset 1.svg" alt="Saifauto Logo" width={40} height={40} className={`p-1 ${styles.loginLogo}`} />
               </div>
               <CardTitle className="text-2xl">Welcome back Imad!</CardTitle>
               <CardDescription>Loading...</CardDescription>
@@ -177,9 +175,7 @@ export default function LoginPage() {
         <Card className="w-full max-w-md z-10">
           <CardHeader className="space-y-2 text-center">
             <div className="flex justify-center">
-              <div className="rounded-full bg-blue-600 p-2">
-                <Car className="h-6 w-6 text-white" />
-              </div>
+              <Image src="/SVG/Asset 1.svg" alt="Saifauto Logo" width={48} height={48} className={`p-1 ${styles.loginLogo}`} />
             </div>
             <CardTitle className="text-2xl">Welcome back Imad!</CardTitle>
             <CardDescription>Enter your credentials to access the dashboard</CardDescription>
