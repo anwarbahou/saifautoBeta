@@ -39,7 +39,7 @@ interface Booking {
   total_price?: string | number;
 }
 
-interface CalendarEvent {
+export interface CalendarEvent {
   id: string | number;
   title: string;
   start: Date;
