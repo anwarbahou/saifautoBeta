@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link"
+import Image from "next/image"
 import { Facebook, Instagram, Linkedin, Mail, MapPin, Phone, Twitter, Car } from "lucide-react"
 
 export default function NewFooter() {
@@ -8,8 +11,14 @@ export default function NewFooter() {
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4 mb-10">
           <div>
             <Link href="/" className="flex items-center gap-2 font-bold text-xl text-white mb-4">
-              <Car className="h-7 w-7 text-primary" />
-              <span className="text-primary">Drive</span>Easy
+              <Image 
+                src="/SVG/Asset 1.svg" 
+                alt="Saifauto Logo" 
+                width={30} 
+                height={30} 
+                className="h-auto footer-logo"
+              />
+              <span className="text-lg font-semibold ml-2">Saifauto</span>
             </Link>
             <p className="mb-4 text-sm leading-relaxed">
               DriveEasy is a premium car rental service dedicated to providing exceptional vehicles and customer service
@@ -107,9 +116,14 @@ export default function NewFooter() {
           </div>
         </div>
         <div className="border-t border-gray-700 mt-10 pt-8 text-sm text-center text-gray-400">
-          <p>&copy; {new Date().getFullYear()} DriveEasy Car Rentals. All rights reserved. Designed with passion.</p>
+          <p>&copy; {new Date().getFullYear()} Saifauto Car Rentals. All rights reserved. Designed with passion.</p>
         </div>
       </div>
+      <style jsx global>{`
+        .footer-logo {
+          filter: brightness(0) invert(1);
+        }
+      `}</style>
     </footer>
   )
 } 
