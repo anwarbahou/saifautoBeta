@@ -193,23 +193,29 @@ export function CarCard({ car, onEdit, onDelete, onPreview }: CarCardProps) {
           ID: CAR-{car.id.toString().padStart(3, "0")}
         </CardDescription>
 
-        <div className="space-y-2 text-sm">
+        <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm text-muted-foreground mb-4">
           <div className="flex items-center">
-            <CalendarDays className="mr-2 h-4 w-4 text-muted-foreground" />
-            <span>Year: {car.year}</span>
+            <CalendarDays className="mr-2 h-4 w-4 text-primary/80" />
+            <span>{car.year}</span>
           </div>
-          <div className="flex items-center">
-            <Gauge className="mr-2 h-4 w-4 text-muted-foreground" />
-            <span>Category: {car.category}</span>
-          </div>
-          <div className="flex items-center">
-            <Palette className="mr-2 h-4 w-4 text-muted-foreground" />
-            <span>Color: {car.color}</span>
-          </div>
-          <div className="flex items-center">
-            <Tag className="mr-2 h-4 w-4 text-muted-foreground" />
-            <span>License: {car.license_plate}</span>
-          </div>
+          {car.category && (
+            <div className="flex items-center">
+              <Gauge className="mr-2 h-4 w-4 text-primary/80" />
+              <span>{car.category}</span>
+            </div>
+          )}
+          {car.color && (
+            <div className="flex items-center">
+              <Palette className="mr-2 h-4 w-4 text-primary/80" />
+              <span>{car.color}</span>
+            </div>
+          )}
+          {car.license_plate && (
+            <div className="flex items-center">
+              <Tag className="mr-2 h-4 w-4 text-primary/80" />
+              <span>{car.license_plate}</span>
+            </div>
+          )}
         </div>
       </CardContent>
 

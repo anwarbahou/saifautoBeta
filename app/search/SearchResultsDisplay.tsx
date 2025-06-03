@@ -1,32 +1,16 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabaseClient';
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Users, Fuel, Cog } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
+import { CarCard, Car as SharedCar } from "@/components/car-card";
 
-interface CarData {
-  id: string | number;
-  name: string;
-  make: string;
-  model: string;
-  type: string;
-  price_per_day: number;
-  image_url: string;
-  seats: number | null;
-  fuel_type: string | null;
-  transmission: string | null;
-}
-
-async function fetchAllCars(): Promise<CarData[]> {
+async function fetchAllCars(): Promise<SharedCar[]> {
   const { data, error } = await supabase
     .from('cars')
-    .select('id, make, model, category, daily_rate, primary_image');
+    .select('id, make, model, year, category, color, license_plate, status, daily_rate, images, primary_image');
 
   if (error) {
     console.error('Error fetching cars from Supabase:', error);
@@ -38,77 +22,43 @@ async function fetchAllCars(): Promise<CarData[]> {
 
   return data.map((car: any) => ({
     id: car.id,
-    name: `${car.make} ${car.model}`,
     make: car.make,
     model: car.model,
-    type: car.category,
-    price_per_day: car.daily_rate,
-    image_url: car.primary_image,
-    seats: null,
-    fuel_type: null,
-    transmission: null,
+    year: car.year,
+    category: car.category,
+    color: car.color,
+    license_plate: car.license_plate,
+    status: car.status,
+    daily_rate: car.daily_rate,
+    images: car.images || [],
+    primary_image: car.primary_image,
   }));
 }
 
-const CarCard = ({ car, searchParams }: { car: CarData, searchParams: URLSearchParams }) => {
-  const carUrl = `/cars/${car.id}?${searchParams.toString()}`;
-  return (
-    <Card className="flex flex-col overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 bg-white">
-      <CardHeader className="p-0 relative">
-        <Link href={carUrl} aria-label={`View details for ${car.name}`}>
-          <div className="aspect-[16/10] w-full overflow-hidden">
-            <Image
-              src={car.image_url || "/img/cars/car-placeholder.png"}
-              alt={car.name}
-              width={600}
-              height={375}
-              className="object-cover w-full h-full transition-transform duration-300 hover:scale-105"
-            />
-          </div>
-        </Link>
-        <Badge variant="default" className="absolute top-4 right-4 bg-primary text-primary-foreground">
-          {car.type || "N/A"}
-        </Badge>
-      </CardHeader>
-      <CardContent className="p-5 flex-grow">
-        <CardTitle className="text-xl font-semibold mb-2 text-gray-900">{car.name}</CardTitle>
-        <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm text-muted-foreground mb-4">
-          <div className="flex items-center gap-2">
-            <Users className="h-4 w-4 text-primary" />
-            <span>{car.seats || "N/A"} Seats</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Fuel className="h-4 w-4 text-primary" />
-            <span>{car.fuel_type || "N/A"}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Cog className="h-4 w-4 text-primary" />
-            <span>{car.transmission || "N/A"}</span>
-          </div>
-        </div>
-      </CardContent>
-      <CardFooter className="p-5 bg-gray-50 border-t flex items-center justify-between">
-        <div>
-          <p className="text-2xl font-bold text-primary">
-            {car.price_per_day} MAD
-          </p>
-        </div>
-        <Button asChild size="default" className="text-base font-semibold">
-          <Link href={carUrl}>Book Now</Link>
-        </Button>
-      </CardFooter>
-    </Card>
-  );
-};
-
 const SearchResultsDisplay = () => {
   const searchParams = useSearchParams();
-  const [cars, setCars] = useState<CarData[]>([]);
+  const [cars, setCars] = useState<SharedCar[]>([]);
   const [loading, setLoading] = useState(true);
 
   const destination = searchParams ? searchParams.get('destination') : null;
   const pickupDateTime = searchParams ? searchParams.get('pickupDateTime') : null;
   const dropoffDateTime = searchParams ? searchParams.get('dropoffDateTime') : null;
+
+  const handleEdit = useCallback((car: SharedCar) => {
+    console.log("Edit car:", car.id);
+  }, []);
+
+  const handleDelete = useCallback(async (carId: number) => {
+    console.log("Delete car:", carId);
+  }, []);
+
+  const handlePreview = useCallback((car: SharedCar) => {
+    console.log("Preview car:", car.id);
+    if (searchParams) {
+      const carUrl = `/cars/${car.id}?${searchParams.toString()}`;
+      window.location.href = carUrl;
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     async function loadCars() {
@@ -137,13 +87,40 @@ const SearchResultsDisplay = () => {
       )}
 
       {loading ? (
-        <div>Loading cars...</div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="bg-white shadow-lg rounded-lg p-4 animate-pulse">
+              <div className="w-full h-48 bg-gray-300 rounded mb-4"></div>
+              <div className="h-6 bg-gray-300 rounded w-3/4 mb-2"></div>
+              <div className="h-4 bg-gray-300 rounded w-1/2 mb-4"></div>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-2 mb-4">
+                <div className="h-4 bg-gray-300 rounded w-full"></div>
+                <div className="h-4 bg-gray-300 rounded w-full"></div>
+                <div className="h-4 bg-gray-300 rounded w-full"></div>
+                <div className="h-4 bg-gray-300 rounded w-full"></div>
+              </div>
+              <div className="flex justify-between items-center">
+                <div className="h-8 bg-gray-300 rounded w-1/3"></div>
+                <div className="h-10 bg-gray-300 rounded w-1/4"></div>
+              </div>
+            </div>
+          ))}
+        </div>
       ) : cars.length === 0 ? (
-        <div>No cars found</div>
+        <div className="text-center py-10">
+          <h2 className="text-2xl font-semibold text-gray-700 mb-2">No cars found</h2>
+          <p className="text-gray-500">Try adjusting your search criteria.</p>
+        </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
           {cars.map((car) => (
-            searchParams && <CarCard key={car.id} car={car} searchParams={searchParams} />
+            <CarCard 
+              key={car.id} 
+              car={car} 
+              onEdit={handleEdit} 
+              onDelete={handleDelete} 
+              onPreview={handlePreview} 
+            />
           ))}
         </div>
       )}

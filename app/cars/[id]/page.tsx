@@ -6,7 +6,7 @@ import NewFooter from "@/components/landing/NewFooter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Users, Fuel, Cog, CalendarDays, DollarSign, CheckCircle, XCircle } from "lucide-react";
+import { CalendarDays, DollarSign, CheckCircle, XCircle, Palette, Tag } from "lucide-react";
 import BookingForm from "./BookingForm";
 import { SearchParams } from "@/lib/types";
 
@@ -90,7 +90,7 @@ export default async function CarDetailsPage({ params, searchParams }: CarDetail
 
   if (!car) {
     return (
-      <div className="flex flex-col min-h-screen bg-background">
+      <div className="flex flex-col min-h-screen bg-white">
         <NewNavbar />
         <main className="flex-grow container mx-auto px-4 py-12 md:py-16 flex items-center justify-center">
           <div className="text-center">
@@ -108,7 +108,7 @@ export default async function CarDetailsPage({ params, searchParams }: CarDetail
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-background">
+    <div className="flex flex-col min-h-screen bg-white">
       <NewNavbar />
       <main className="flex-grow container mx-auto px-4 py-12 md:py-16">
         <div className="grid md:grid-cols-3 gap-8 lg:gap-12">
@@ -177,54 +177,35 @@ export default async function CarDetailsPage({ params, searchParams }: CarDetail
 
             <h2 className="text-2xl font-semibold mb-6 border-b pb-3">Specifications</h2>
             <div className="space-y-5">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3 text-muted-foreground">
-                  <Users className="h-5 w-5 text-primary" />
-                  <span className="font-medium">Seats</span>
+              {car.type && (
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3 text-muted-foreground">
+                    <Tag className="h-5 w-5 text-primary" />
+                    <span className="font-medium">Type</span>
+                  </div>
+                  <Badge variant="outline" className="font-semibold text-base px-3 py-1">{car.type}</Badge>
                 </div>
-                <span className="font-semibold text-gray-800">{car.seats || "N/A"}</span>
-              </div>
+              )}
 
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3 text-muted-foreground">
-                  <Fuel className="h-5 w-5 text-primary" />
-                  <span className="font-medium">Fuel Type</span>
+              {car.color && (
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3 text-muted-foreground">
+                    <Palette className="h-5 w-5 text-primary" />
+                    <span className="font-medium">Color</span>
+                  </div>
+                  <Badge variant="outline" className="font-semibold text-base px-3 py-1">{car.color}</Badge>
                 </div>
-                <span className="font-semibold text-gray-800">{car.fuel_type || "N/A"}</span>
-              </div>
+              )}
 
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3 text-muted-foreground">
-                  <Cog className="h-5 w-5 text-primary" />
-                  <span className="font-medium">Transmission</span>
+              {car.year && (
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3 text-muted-foreground">
+                    <CalendarDays className="h-5 w-5 text-primary" />
+                    <span className="font-medium">Year</span>
+                  </div>
+                  <span className="font-semibold text-gray-800">{car.year}</span>
                 </div>
-                <span className="font-semibold text-gray-800">{car.transmission || "N/A"}</span>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3 text-muted-foreground">
-                  {/* Using a generic icon like ListChecks or similar if Car icon is too specific */}
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-car-taxi-front text-primary"><path d="M10 2h4"/><path d="m21 8-2 2-1.5-3.7A2 2 0 0 0 15.646 5H8.4a2 2 0 0 0-1.903 1.257L5 10 3 8"/><path d="M7 14h.01"/><path d="M17 14h.01"/><rect width="18" height="8" x="3" y="10" rx="2"/><path d="M5 18v2"/><path d="M19 18v2"/></svg>
-                  <span className="font-medium">Type</span>
-                </div>
-                <Badge variant="outline" className="font-semibold text-base px-3 py-1">{car.type || "N/A"}</Badge>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3 text-muted-foreground">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-palette text-primary"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/><path d="m10.5 10.5-5 5"/><circle cx="7.5" cy="13.5" r=".5" fill="currentColor"/><circle cx="15.5" cy="8.5" r=".5" fill="currentColor"/></svg>
-                  <span className="font-medium">Color</span>
-                </div>
-                <Badge variant="outline" className="font-semibold text-base px-3 py-1">{car.color || "N/A"}</Badge>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3 text-muted-foreground">
-                  <CalendarDays className="h-5 w-5 text-primary" />
-                  <span className="font-medium">Year</span>
-                </div>
-                <span className="font-semibold text-gray-800">{car.year || "N/A"}</span>
-              </div>
+              )}
             </div>
             
             {/* Placeholder for Description or more features */}

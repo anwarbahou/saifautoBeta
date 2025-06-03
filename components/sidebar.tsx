@@ -11,7 +11,8 @@ import {
   Settings,
   PanelLeftClose,
   Car as CarIcon,
-  CalendarDays
+  CalendarDays,
+  FileText
 } from "lucide-react"
 import Image from "next/image"
 import { cn } from "@/lib/utils"
@@ -53,6 +54,7 @@ export function Sidebar() {
     { name: "Bookings", href: "/dashboard/bookings", icon: Calendar },
     { name: "WhatsApp", href: "/dashboard/whatsapp", icon: MessageCircle },
     { name: "Calendar", href: "/dashboard/calendar", icon: CalendarDays },
+    { name: "Documents", href: "/dashboard/documents", icon: FileText },
     { name: "Settings", href: "/dashboard/settings", icon: Settings },
   ]
   
