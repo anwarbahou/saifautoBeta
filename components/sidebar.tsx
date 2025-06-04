@@ -148,24 +148,42 @@ export function Sidebar() {
           })}
         </nav>
       </div>
-      <div className="mt-auto p-2 border-t">
-        <button
-          onClick={handleSignOut}
-          title={isCollapsed ? "Sign Out" : undefined}
-          className={cn(
-            "flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-all hover:text-foreground",
-            isCollapsed && "justify-center"
-          )}
-        >
-          <LogOut className={cn("h-5 w-5 flex-shrink-0", isCollapsed && "h-6 w-6")} />
-          {!isCollapsed && <span>Sign Out</span>}
-        </button>
+      <div className="mt-auto flex flex-col items-center">
+        <Image
+          src="/SVG/finalAsset 1.svg"
+          alt="Sidebar Decorative SVG"
+          width={40}
+          height={40}
+          className="mb-2 sidebar-svg"
+        />
+        {!isCollapsed && (
+          <div className="text-xs text-muted-foreground text-center mb-2">powered by Veyto</div>
+        )}
+        <div className="w-full p-2 border-t">
+          <button
+            onClick={handleSignOut}
+            title={isCollapsed ? "Sign Out" : undefined}
+            className={cn(
+              "flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-all hover:text-foreground",
+              isCollapsed && "justify-center"
+            )}
+          >
+            <LogOut className={cn("h-5 w-5 flex-shrink-0", isCollapsed && "h-6 w-6")} />
+            {!isCollapsed && <span>Sign Out</span>}
+          </button>
+        </div>
       </div>
       <style jsx global>{`
         html.light .sidebar-logo {
           filter: none;
         }
         html.dark .sidebar-logo {
+          filter: brightness(0) invert(1);
+        }
+        html.light .sidebar-svg {
+          filter: none;
+        }
+        html.dark .sidebar-svg {
           filter: brightness(0) invert(1);
         }
       `}</style>
