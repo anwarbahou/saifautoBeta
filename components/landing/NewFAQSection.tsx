@@ -8,39 +8,39 @@ import {
 const faqs = [
   {
     id: "faq1",
-    question: "What documents do I need to rent a car?",
+    question: "Quels documents dois-je fournir pour louer une voiture ?",
     answer:
-      "To rent a car, you'll need a valid driver's license, a credit card in your name, and a form of identification (such as a passport for international rentals). Some locations may require additional documentation.",
+      "Pour louer une voiture, vous aurez besoin d'un permis de conduire valide, d'une carte de crédit à votre nom et d'une pièce d'identité (comme un passeport pour les locations internationales). Certains endroits peuvent exiger des documents supplémentaires.",
   },
   {
     id: "faq2",
-    question: "Is there a minimum age requirement to rent a car?",
+    question: "Y a-t-il un âge minimum pour louer une voiture ?",
     answer:
-      "Yes, the standard minimum age is 21, but it may vary by location and car category. Drivers under 25 may be subject to a young driver surcharge.",
+      "Oui, l'âge minimum standard est de 21 ans, mais cela peut varier selon l'emplacement et la catégorie de voiture. Les conducteurs de moins de 25 ans peuvent être soumis à des frais supplémentaires.",
   },
   {
     id: "faq3",
-    question: "Can I pick up the car at one location and return it to another?",
+    question: "Puis-je prendre la voiture à un endroit et la rendre à un autre ?",
     answer:
-      "Yes, we offer one-way rentals at many of our locations. Additional fees may apply for one-way rentals, especially for long distances.",
+      "Oui, nous proposons des locations aller simple dans plusieurs de nos agences. Des frais supplémentaires peuvent s'appliquer pour les locations aller simple, en particulier pour les longues distances.",
   },
   {
     id: "faq4",
-    question: "What is your fuel policy?",
+    question: "Quelle est votre politique de carburant ?",
     answer:
-      "Our standard policy is 'full-to-full'. This means you'll receive the car with a full tank and are expected to return it with a full tank. If you return the car with less fuel, you'll be charged for the missing fuel plus a refueling service fee.",
+      "Notre politique standard est 'plein-plein'. Cela signifie que vous recevrez la voiture avec le plein et devrez la rendre avec le plein. Si vous rendez la voiture avec moins de carburant, vous serez facturé pour le carburant manquant plus des frais de service.",
   },
   {
     id: "faq5",
-    question: "Do you offer unlimited mileage?",
+    question: "Proposez-vous un kilométrage illimité ?",
     answer:
-      "Yes, most of our rentals come with unlimited mileage. However, some specialty vehicles or promotional rates may have mileage restrictions. The mileage policy will be clearly stated during the booking process.",
+      "Oui, la plupart de nos locations incluent un kilométrage illimité. Cependant, certains véhicules spéciaux ou tarifs promotionnels peuvent avoir des restrictions de kilométrage. La politique de kilométrage sera clairement indiquée lors de la réservation.",
   },
   {
     id: "faq6",
-    question: "What happens if I return the car late?",
+    question: "Que se passe-t-il si je rends la voiture en retard ?",
     answer:
-      "If you return the car later than the agreed time, you may be charged for an additional day. We typically provide a grace period of 29 minutes, but this can vary by location.",
+      "Si vous rendez la voiture après l'heure convenue, vous pourrez être facturé pour une journée supplémentaire. Nous accordons généralement un délai de grâce de 29 minutes, mais cela peut varier selon l'emplacement.",
   },
 ]
 

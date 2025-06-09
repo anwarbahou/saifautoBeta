@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 import { Button } from "@/components/ui/button";
 import { DateTimePicker } from "@/components/ui/DateTimePicker";
+import { Loader2 } from "lucide-react";
 
 interface Car {
   id: string | number;
@@ -285,25 +286,35 @@ const BookingForm = ({ car, initialPickupDate = "", initialReturnDate = "", init
           </div>
         </div>
       )}
-      <form onSubmit={handleSubmit} className="space-y-4" aria-label="Booking form">
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {error && (
+          <div className="p-3 rounded bg-red-50 border border-red-200 text-red-600 text-sm">
+            {error}
+          </div>
+        )}
+        {success && (
+          <div className="p-3 rounded bg-green-50 border border-green-200 text-green-600 text-sm">
+            Votre demande de réservation a été envoyée avec succès !
+          </div>
+        )}
         <div>
-          <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">First Name</label>
-          <input type="text" id="firstName" name="firstName" autoComplete="given-name" required value={form.firstName} onChange={handleChange} className="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 focus:ring-primary focus:border-primary" tabIndex={0} aria-label="First Name" />
+          <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Prénom</label>
+          <input type="text" id="firstName" name="firstName" autoComplete="given-name" required value={form.firstName} onChange={handleChange} className="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 focus:ring-primary focus:border-primary" tabIndex={0} aria-label="Prénom" />
         </div>
         <div>
-          <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Last Name</label>
-          <input type="text" id="lastName" name="lastName" autoComplete="family-name" required value={form.lastName} onChange={handleChange} className="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 focus:ring-primary focus:border-primary" tabIndex={0} aria-label="Last Name" />
+          <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nom</label>
+          <input type="text" id="lastName" name="lastName" autoComplete="family-name" required value={form.lastName} onChange={handleChange} className="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 focus:ring-primary focus:border-primary" tabIndex={0} aria-label="Nom" />
         </div>
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email Address</label>
-          <input type="email" id="email" name="email" autoComplete="email" required value={form.email} onChange={handleChange} className="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 focus:ring-primary focus:border-primary" tabIndex={0} aria-label="Email Address" />
+          <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
+          <input type="email" id="email" name="email" autoComplete="email" required value={form.email} onChange={handleChange} className="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 focus:ring-primary focus:border-primary" tabIndex={0} aria-label="Email" />
         </div>
         <div>
-          <label htmlFor="phone" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Phone Number</label>
-          <input type="tel" id="phone" name="phone" autoComplete="tel" required value={form.phone} onChange={handleChange} className="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 focus:ring-primary focus:border-primary" tabIndex={0} aria-label="Phone Number" />
+          <label htmlFor="phone" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Téléphone</label>
+          <input type="tel" id="phone" name="phone" autoComplete="tel" required value={form.phone} onChange={handleChange} className="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 focus:ring-primary focus:border-primary" tabIndex={0} aria-label="Téléphone" />
         </div>
         <div>
-          <label htmlFor="pickupLocation" className="block text-sm font-medium text-gray-700 mb-1">Pick-up Location</label>
+          <label htmlFor="pickupLocation" className="block text-sm font-medium text-gray-700 mb-1">Lieu de prise en charge</label>
           <input
             type="text"
             id="pickupLocation"
@@ -313,11 +324,11 @@ const BookingForm = ({ car, initialPickupDate = "", initialReturnDate = "", init
             onChange={handleChange}
             className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm bg-white focus:ring-primary focus:border-primary"
             tabIndex={0}
-            aria-label="Pick-up Location"
+            aria-label="Lieu de prise en charge"
           />
         </div>
         <div>
-          <label htmlFor="pickupDate" className="block text-sm font-medium text-gray-700 mb-1">Pick-up Date & Time</label>
+          <label htmlFor="pickupDate" className="block text-sm font-medium text-gray-700 mb-1">Date et heure de prise en charge</label>
           <DateTimePicker
             value={form.pickupDate ? new Date(form.pickupDate) : undefined}
             onChange={date => setForm({ ...form, pickupDate: date ? date.toISOString() : "" })}
@@ -325,28 +336,26 @@ const BookingForm = ({ car, initialPickupDate = "", initialReturnDate = "", init
           />
         </div>
         <div>
-          <label htmlFor="returnDate" className="block text-sm font-medium text-gray-700 mb-1">Return Date & Time</label>
+          <label htmlFor="returnDate" className="block text-sm font-medium text-gray-700 mb-1">Date et heure de retour</label>
           <DateTimePicker
             value={form.returnDate ? new Date(form.returnDate) : undefined}
             onChange={date => setForm({ ...form, returnDate: date ? date.toISOString() : "" })}
             disabled={date => {
-              const pickupDate = form.pickupDate ? new Date(form.pickupDate) : new Date(new Date().setHours(0,0,0,0));
-              return date < pickupDate;
+              const pickupDate = form.pickupDate ? new Date(form.pickupDate) : null;
+              return date < (pickupDate || new Date());
             }}
           />
         </div>
-        <Button
-          id="booking-form-submit"
-          type="submit"
-          className="w-full text-lg py-3 mt-2"
-          size="lg"
-          disabled={loading}
-          aria-label="Request to Book"
-        >
-          {loading ? "Submitting..." : "Request to Book"}
+        <Button type="submit" className="w-full" disabled={loading}>
+          {loading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Envoi en cours...
+            </>
+          ) : (
+            "Réserver maintenant"
+          )}
         </Button>
-        {success && <p className="text-green-600 text-center mt-2" role="status">Booking request sent!</p>}
-        {error && <p className="text-red-600 text-center mt-2" role="alert">{error}</p>}
       </form>
     </>
   );

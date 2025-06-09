@@ -72,9 +72,9 @@ export function CarStatusOverview() {
   if (statusData.length === 0 && !loading && !error) {
     return (
        <Card className="col-span-1 md:col-span-1 lg:col-span-1 flex flex-col items-center justify-center">
-        <CardHeader className="pb-2"><CardTitle className="text-lg font-medium">Car Status Overview</CardTitle></CardHeader>
+        <CardHeader className="pb-2"><CardTitle className="text-lg font-medium">État de la Flotte</CardTitle></CardHeader>
         <CardContent className="flex-grow flex items-center justify-center">
-            <p className="text-muted-foreground">No car status data available.</p>
+            <p className="text-muted-foreground">Aucune donnée disponible</p>
         </CardContent>
       </Card>
     );
@@ -83,8 +83,8 @@ export function CarStatusOverview() {
   return (
     <Card className="col-span-1 md:col-span-1 lg:col-span-1 flex flex-col">
       <CardHeader className="pb-2">
-        <CardTitle className="text-lg font-medium">Car Status Overview</CardTitle>
-        <CardDescription className="text-sm">Current distribution of cars by status.</CardDescription>
+        <CardTitle className="text-lg font-medium">État de la Flotte</CardTitle>
+        <CardDescription className="text-sm">Vue d'ensemble de l'état des véhicules</CardDescription>
       </CardHeader>
       <CardContent className="pb-4 flex-grow">
         <ResponsiveContainer width="100%" height="100%">

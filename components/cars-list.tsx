@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback, useMemo } from "react"
-import { Car as CarIconLucide, Edit, MoreHorizontal, Trash } from "lucide-react"
+import { Car as CarIconLucide, Edit, MoreHorizontal, Trash, Plus } from "lucide-react"
 import Image from "next/image"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -38,6 +38,22 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import {
+  Tag,
+  Palette,
+  DollarSign,
+  Key,
+  Eye,
+  Trash2,
+  Loader2,
+} from "lucide-react"
 
 // Define the Car type based on database schema and form usage
 interface Car {
@@ -367,73 +383,66 @@ export function CarsList() {
             <CardTitle className="text-2xl font-bold tracking-tight">Cars Fleet</CardTitle>
             <CardDescription>Manage your rental vehicles. View details, edit, or add new cars.</CardDescription>
           </div>
-          <AddCarModal onAddCar={handleAddCar} />
+          <Button onClick={() => setIsEditModalOpen(true)} className="whitespace-nowrap">
+            <Plus className="h-4 w-4 mr-2" />
+            Ajouter un véhicule
+          </Button>
         </div>
         <div className="mt-6 flex flex-col space-y-4 md:flex-row md:justify-between md:items-center md:space-y-0">
           <div className="w-full md:w-1/3">
             <Input
-              placeholder="Search by make, model, or license plate..."
+              placeholder="Rechercher un véhicule..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="max-w-sm"
+              className="w-full sm:w-[300px]"
             />
           </div>
           <div className="flex flex-wrap items-center gap-2 md:gap-4">
-            <Select value={selectedMake || ""} onValueChange={(value) => setSelectedMake(value === "all" ? null : value)}>
-              <SelectTrigger className={`w-full md:w-[160px] ${selectedMake ? 'bg-blue-100 dark:bg-blue-900' : ''}`}>
-                <SelectValue placeholder="Filter by Make" />
+            <Select value={selectedMake} onValueChange={setSelectedMake}>
+              <SelectTrigger className="w-full sm:w-[180px]">
+                <SelectValue placeholder="Marque" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Makes</SelectItem>
-                {uniqueMakes.map((make) => (
-                  <SelectItem key={make} value={make}>
-                    {make}
-                  </SelectItem>
+                <SelectItem value="">Toutes les marques</SelectItem>
+                {Array.from(new Set(allFetchedCars.map(car => car.make))).sort().map(make => (
+                  <SelectItem key={make} value={make}>{make}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
 
-            <Select value={selectedModel || ""} onValueChange={(value) => setSelectedModel(value === "all" ? null : value)} disabled={!selectedMake && uniqueModels.length === 0}>
-              <SelectTrigger className={`w-full md:w-[160px] ${selectedModel ? 'bg-blue-100 dark:bg-blue-900' : ''}`}>
-                <SelectValue placeholder="Filter by Model" />
+            <Select value={selectedModel} onValueChange={setSelectedModel}>
+              <SelectTrigger className="w-full sm:w-[180px]">
+                <SelectValue placeholder="Modèle" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Models</SelectItem>
-                {uniqueModels
-                  .filter(model => !selectedMake || allFetchedCars.find(car => car.make === selectedMake && car.model === model))
-                  .map((model) => (
-                  <SelectItem key={model} value={model}>
-                    {model}
-                  </SelectItem>
+                <SelectItem value="">Tous les modèles</SelectItem>
+                {Array.from(new Set(allFetchedCars.map(car => car.model))).sort().map(model => (
+                  <SelectItem key={model} value={model}>{model}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
 
-            <Select value={selectedYear?.toString() || ""} onValueChange={(value) => setSelectedYear(value === "all" ? null : parseInt(value))}>
-              <SelectTrigger className={`w-full md:w-[120px] ${selectedYear ? 'bg-blue-100 dark:bg-blue-900' : ''}`}>
-                <SelectValue placeholder="Filter by Year" />
+            <Select value={selectedYear?.toString()} onValueChange={(value) => setSelectedYear(value ? parseInt(value) : null)}>
+              <SelectTrigger className="w-full sm:w-[180px]">
+                <SelectValue placeholder="Année" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Years</SelectItem>
-                {uniqueYears.map((year) => (
-                  <SelectItem key={year} value={year.toString()}>
-                    {year}
-                  </SelectItem>
+                <SelectItem value="">Toutes les années</SelectItem>
+                {Array.from(new Set(allFetchedCars.map(car => car.year))).sort().map(year => (
+                  <SelectItem key={year} value={year?.toString() || ""}>{year}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
 
-            <Select value={selectedStatus || ""} onValueChange={(value) => setSelectedStatus(value === "all" ? null : value)}>
-              <SelectTrigger className={`w-full md:w-[150px] ${selectedStatus ? 'bg-blue-100 dark:bg-blue-900' : ''}`}>
-                <SelectValue placeholder="Filter by Status" />
+            <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+              <SelectTrigger className="w-full sm:w-[180px]">
+                <SelectValue placeholder="État" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Statuses</SelectItem>
-                {uniqueStatuses.map((status) => (
-                  <SelectItem key={status} value={status}>
-                    {status}
-                  </SelectItem>
-                ))}
+                <SelectItem value="">Tous les états</SelectItem>
+                <SelectItem value="Available">Disponible</SelectItem>
+                <SelectItem value="Rented">Loué</SelectItem>
+                <SelectItem value="Maintenance">En maintenance</SelectItem>
               </SelectContent>
             </Select>
             <Button onClick={handleResetFilters} variant="outline">Reset Filters</Button>
@@ -442,10 +451,9 @@ export function CarsList() {
       </CardHeader>
       <CardContent className="pt-0">
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 py-6">
-            {Array.from({ length: itemsPerPage }).map((_, index) => (
-              <CarCardSkeleton key={index} />
-            ))}
+          <div className="flex items-center justify-center py-8">
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            <span className="ml-3 text-muted-foreground">Chargement des véhicules...</span>
           </div>
         ) : filteredCars.length === 0 ? (
           <div className="text-center py-20">

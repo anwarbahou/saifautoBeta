@@ -52,8 +52,8 @@ export function RecentlyAddedCars() {
     <Card className="col-span-1 md:col-span-1 lg:col-span-1">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <div>
-          <CardTitle className="text-lg font-medium">Recently Added Cars</CardTitle>
-          <CardDescription className="text-sm">Newest additions to your fleet.</CardDescription>
+          <CardTitle className="text-lg font-medium">Véhicules Récemment Ajoutés</CardTitle>
+          <CardDescription className="text-sm">Les derniers véhicules ajoutés à la flotte</CardDescription>
         </div>
         <Button variant="outline" size="sm" asChild>
           <Link href="/dashboard/cars">View All <ArrowRight className="ml-2 h-4 w-4" /></Link>
@@ -61,21 +61,25 @@ export function RecentlyAddedCars() {
       </CardHeader>
       <CardContent>
         {loading && (
-          <div className="flex items-center justify-center h-48">
+          <div className="flex items-center justify-center py-8">
             <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            <span className="ml-3 text-muted-foreground">Chargement des véhicules...</span>
           </div>
         )}
-        {error && !loading && (
-          <div className="flex flex-col items-center justify-center h-48 text-destructive">
-            <AlertTriangle className="h-8 w-8 mb-2" />
-            <p className="text-center">{error}</p>
+
+        {error && (
+          <div className="flex items-center justify-center py-8">
+            <AlertTriangle className="h-8 w-8 text-destructive" />
+            <span className="ml-3 text-destructive">Erreur lors du chargement des véhicules</span>
           </div>
         )}
+
         {!loading && !error && cars.length === 0 && (
-          <div className="flex flex-col items-center justify-center h-48">
-            <p className="text-muted-foreground">No cars added recently.</p>
+          <div className="text-center py-8 text-muted-foreground">
+            Aucun véhicule ajouté récemment
           </div>
         )}
+
         {!loading && !error && cars.length > 0 && (
           <div className="space-y-3 pt-2">
             {cars.map((car) => (
@@ -92,15 +96,15 @@ export function RecentlyAddedCars() {
                       />
                     ) : (
                       <div className="flex items-center justify-center h-full w-full bg-muted text-muted-foreground text-xs">
-                        No Image
+                        Pas d'image
                       </div>
                     )}
                   </div>
                   <div className="flex-grow min-w-0">
                     <h4 className="font-medium truncate text-sm">{car.make} {car.model}</h4>
-                    <p className="text-xs text-muted-foreground">Year: {car.year}</p>
+                    <p className="text-xs text-muted-foreground">Année : {car.year}</p>
                     <Badge variant={car.status === "Available" ? "default" : car.status === "Rented" ? "destructive" : "secondary"} className="mt-1 text-xs">
-                      {car.status}
+                      {car.status === "Available" ? "Disponible" : car.status === "Rented" ? "Loué" : car.status}
                     </Badge>
                   </div>
                 </div>

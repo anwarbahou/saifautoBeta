@@ -6,7 +6,7 @@ import NewFooter from "@/components/landing/NewFooter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CalendarDays, DollarSign, CheckCircle, XCircle, Palette, Tag } from "lucide-react";
+import { CalendarDays, DollarSign, CheckCircle, XCircle, Palette, Tag, Users, Cog, Fuel } from "lucide-react";
 import BookingForm from "./BookingForm";
 import { SearchParams } from "@/lib/types";
 
@@ -25,6 +25,9 @@ interface CarDetailsData {
   fuel_type: string | null;
   transmission: string | null;
   status: string | null;
+  category: string | null;
+  primary_image: string;
+  features: string[] | null;
 }
 
 async function fetchCarDetails(id: string): Promise<CarDetailsData | null> {
@@ -32,7 +35,7 @@ async function fetchCarDetails(id: string): Promise<CarDetailsData | null> {
     const { data: car_data, error } = await supabase
       .from('cars')
       // Removed seats, fuel_type, transmission from select as they don't exist
-      .select('id, make, model, year, color, category, daily_rate, primary_image, images, status') 
+      .select('id, make, model, year, color, category, daily_rate, primary_image, images, status, features') 
       .eq('id', id)
       .single();
 
@@ -64,6 +67,9 @@ async function fetchCarDetails(id: string): Promise<CarDetailsData | null> {
       fuel_type: null, // Explicitly null as not fetched
       transmission: null, // Explicitly null as not fetched
       status: car_data.status,
+      category: car_data.category,
+      primary_image: car_data.primary_image,
+      features: car_data.features,
     };
   } catch (err) {
     console.error(`Exception during fetchCarDetails for ID ${id}:`, err);
@@ -95,10 +101,10 @@ export default async function CarDetailsPage({ params, searchParams }: CarDetail
         <main className="flex-grow container mx-auto px-4 py-12 md:py-16 flex items-center justify-center">
           <div className="text-center">
             <XCircle className="h-24 w-24 mx-auto text-destructive mb-4" />
-            <h1 className="text-3xl font-bold mb-2">Car Not Found</h1>
-            <p className="text-muted-foreground mb-6">Sorry, we couldn't find details for this car.</p>
+            <h1 className="text-3xl font-bold mb-2">Voiture Non Trouvée</h1>
+            <p className="text-muted-foreground mb-6">Désolé, nous n'avons pas pu trouver les détails de cette voiture.</p>
             <Button asChild>
-              <Link href="/fleet">Back to Fleet</Link>
+              <Link href="/fleet">Retour à la Flotte</Link>
             </Button>
           </div>
         </main>
@@ -118,12 +124,12 @@ export default async function CarDetailsPage({ params, searchParams }: CarDetail
               <CardHeader>
                 <CardTitle className="text-2xl flex items-center">
                   <CalendarDays className="h-6 w-6 mr-3 text-primary" />
-                  Book This Car
+                  Réserver Cette Voiture
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground mb-6">
-                  Complete your details to request a booking for the {car.name}.
+                  Complétez vos informations pour demander une réservation pour la {car.name}.
                 </p>
                 <BookingForm 
                   car={car} 
@@ -137,84 +143,88 @@ export default async function CarDetailsPage({ params, searchParams }: CarDetail
 
           {/* Right Column: Car Details */}
           <div className="md:col-span-2">
-            <div className="aspect-[16/9] w-full overflow-hidden rounded-lg shadow-xl mb-8 bg-gray-200">
-              <Image
-                src={car.image_url || "/img/cars/car-placeholder.png"}
-                alt={`Image of ${car.name}`}
-                width={1200}
-                height={675}
-                className="object-cover w-full h-full"
-                priority // Prioritize loading the main car image
-              />
-            </div>
-            
-            {/* Price and Status */}
-            <div className="mb-8 p-4 bg-gray-100 rounded-lg flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div className="grid gap-8">
+              {/* Car Images */}
+              <div className="aspect-[16/9] relative rounded-lg overflow-hidden bg-muted">
+                <Image
+                  src={car.primary_image || "/img/cars/car-placeholder.png"}
+                  alt={car.name}
+                  fill
+                  className="object-cover"
+                  priority
+                />
+              </div>
+
+              {/* Car Info */}
+              <div className="grid gap-6">
                 <div>
-                    <p className="text-3xl font-bold text-primary">
-                        {car.daily_rate} MAD
-                        <span className="text-lg font-normal text-muted-foreground">/day</span>
-                    </p>
-                </div>
-                <Badge 
-                    variant={car.status === 'Rented' ? 'destructive' : 'outline'}
-                    className={`text-lg px-4 py-2 whitespace-nowrap ${car.status === 'Available' ? 'border-green-500 text-green-700 bg-green-50' : car.status === 'Rented' ? '' : 'border-yellow-500 text-yellow-700 bg-yellow-50' }`}
-                >
-                    {car.status === 'Available' && <CheckCircle className="h-5 w-5 mr-2" />}
-                    {/* For 'Rented', destructive variant already implies an issue, no specific icon needed unless desired */}
-                    {car.status !== 'Available' && car.status !== 'Rented' &&  <XCircle className="h-5 w-5 mr-2" />}
-                    {car.status || 'Status N/A'}
-                </Badge>
-            </div>
-
-            {/* Car Name, Type, and Model/Year - Moved here */}
-            <div className="mb-6">
-              <h1 className="text-3xl md:text-4xl font-bold mb-1">{car.name}</h1>
-              <p className="text-lg text-muted-foreground">
-                {car.type} &bull; {car.model} {car.year ? `(${car.year})` : ''}
-              </p>
-            </div>
-
-            <h2 className="text-2xl font-semibold mb-6 border-b pb-3">Specifications</h2>
-            <div className="space-y-5">
-              {car.type && (
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3 text-muted-foreground">
-                    <Tag className="h-5 w-5 text-primary" />
-                    <span className="font-medium">Type</span>
+                  <h1 className="text-3xl font-bold mb-2">{car.name}</h1>
+                  <div className="flex flex-wrap gap-2">
+                    <Badge variant="outline" className="text-sm">
+                      {car.category || "Non spécifié"}
+                    </Badge>
+                    <Badge variant="outline" className="text-sm">
+                      Année {car.year || "Non spécifiée"}
+                    </Badge>
+                    {car.color && (
+                      <Badge variant="outline" className="text-sm flex items-center gap-1">
+                        <Palette className="h-3 w-3" />
+                        {car.color}
+                      </Badge>
+                    )}
+                    {car.status && (
+                      <Badge variant={car.status === "Available" ? "default" : "secondary"} className="text-sm">
+                        {car.status === "Available" ? "Disponible" : "Non disponible"}
+                      </Badge>
+                    )}
                   </div>
-                  <Badge variant="outline" className="font-semibold text-base px-3 py-1">{car.type}</Badge>
                 </div>
-              )}
 
-              {car.color && (
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3 text-muted-foreground">
-                    <Palette className="h-5 w-5 text-primary" />
-                    <span className="font-medium">Color</span>
-                  </div>
-                  <Badge variant="outline" className="font-semibold text-base px-3 py-1">{car.color}</Badge>
+                {/* Price */}
+                <div className="flex items-center gap-2 text-2xl font-bold">
+                  <DollarSign className="h-6 w-6 text-primary" />
+                  {car.daily_rate} MAD
+                  <span className="text-base font-normal text-muted-foreground">/jour</span>
                 </div>
-              )}
 
-              {car.year && (
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3 text-muted-foreground">
-                    <CalendarDays className="h-5 w-5 text-primary" />
-                    <span className="font-medium">Year</span>
-                  </div>
-                  <span className="font-semibold text-gray-800">{car.year}</span>
+                {/* Features Grid */}
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  {car.seats && (
+                    <div className="flex items-center gap-2">
+                      <Users className="h-5 w-5 text-primary" />
+                      <span>{car.seats} Places</span>
+                    </div>
+                  )}
+                  {car.fuel_type && (
+                    <div className="flex items-center gap-2">
+                      <Fuel className="h-5 w-5 text-primary" />
+                      <span>{car.fuel_type}</span>
+                    </div>
+                  )}
+                  {car.transmission && (
+                    <div className="flex items-center gap-2">
+                      <Cog className="h-5 w-5 text-primary" />
+                      <span>{car.transmission}</span>
+                    </div>
+                  )}
                 </div>
-              )}
+
+                {/* Features List */}
+                {car.features && car.features.length > 0 && (
+                  <div>
+                    <h2 className="text-xl font-semibold mb-3">Caractéristiques</h2>
+                    <div className="grid grid-cols-2 gap-2">
+                      {car.features.map((feature, index) => (
+                        <div key={index} className="flex items-center gap-2">
+                          <CheckCircle className="h-4 w-4 text-primary" />
+                          <span>{feature}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
-            
-            {/* Placeholder for Description or more features */}
-            {/* {car.description && (
-              <>
-                <h2 className="text-2xl font-semibold mt-8 mb-4 border-b pb-2">Description</h2>
-                <p className="text-muted-foreground leading-relaxed">{car.description}</p>
-              </>
-            )} */}
           </div>
         </div>
       </main>

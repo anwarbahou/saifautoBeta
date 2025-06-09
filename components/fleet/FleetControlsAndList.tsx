@@ -175,7 +175,7 @@ const FleetControlsAndList: React.FC<FleetControlsAndListProps> = ({ initialCars
                   </p>
                 </div>
                 <Button asChild size="default" className="text-base font-semibold">
-                  <Link href={getCarUrl(car_item.id)}>Book Now</Link>
+                  <Link href={getCarUrl(car_item.id)}>Réserver</Link>
                 </Button>
               </CardFooter>
             </Card>

@@ -73,16 +73,16 @@ const SearchResultsDisplay = () => {
   return (
     <div className="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
       <h1 className="mb-8 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-        Search Results
+        Résultats de Recherche
       </h1>
       {destination && (
         <p className="mb-2 text-lg text-gray-700">
-          Showing results for: <strong>{destination}</strong>
+          Résultats pour : <strong>{destination}</strong>
         </p>
       )}
       {pickupDateTime && dropoffDateTime && (
         <p className="mb-6 text-md text-gray-600">
-          From: <strong>{new Date(pickupDateTime).toISOString().slice(0, 19).replace('T', ' ')}</strong> To: <strong>{new Date(dropoffDateTime).toISOString().slice(0, 19).replace('T', ' ')}</strong>
+          Du : <strong>{new Date(pickupDateTime).toISOString().slice(0, 19).replace('T', ' ')}</strong> Au : <strong>{new Date(dropoffDateTime).toISOString().slice(0, 19).replace('T', ' ')}</strong>
         </p>
       )}
 
@@ -106,22 +106,21 @@ const SearchResultsDisplay = () => {
             </div>
           ))}
         </div>
-      ) : cars.length === 0 ? (
-        <div className="text-center py-10">
-          <h2 className="text-2xl font-semibold text-gray-700 mb-2">No cars found</h2>
-          <p className="text-gray-500">Try adjusting your search criteria.</p>
-        </div>
-      ) : (
+      ) : cars.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
           {cars.map((car) => (
-            <CarCard 
-              key={car.id} 
-              car={car} 
-              onEdit={handleEdit} 
-              onDelete={handleDelete} 
-              onPreview={handlePreview} 
+            <CarCard
+              key={car.id}
+              car={car}
+              onEdit={() => handleEdit(car)}
+              onDelete={() => handleDelete(Number(car.id))}
+              onPreview={() => handlePreview(car)}
             />
           ))}
+        </div>
+      ) : (
+        <div className="text-center py-12">
+          <p className="text-lg text-gray-600">Aucune voiture disponible pour les critères sélectionnés.</p>
         </div>
       )}
     </div>

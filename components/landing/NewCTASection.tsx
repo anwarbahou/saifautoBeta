@@ -8,17 +8,16 @@ export default function NewCTASection() {
       <div className="container mx-auto px-4">
         <div className="grid gap-8 md:grid-cols-2 items-center">
           <div>
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl mb-4">Ready to Hit the Road?</h2>
+            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl mb-4">Prêt à Prendre la Route ?</h2>
             <p className="text-lg mb-6 max-w-xl">
-              Join thousands of satisfied customers who choose DriveEasy for their car rental needs. Sign up today and
-              get 10% off your first rental.
+              Rejoignez des milliers de clients satisfaits qui choisissent DriveEasy pour leurs besoins de location de voiture. Inscrivez-vous aujourd'hui et obtenez 10% de réduction sur votre première location.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Button variant="secondary" size="lg" asChild className="text-base font-semibold">
-                <Link href="/fleet">Explore Our Fleet</Link>
+                <Link href="/fleet">Découvrez Notre Flotte</Link>
               </Button>
               <Button variant="outline" size="lg" className="bg-transparent border-white text-white hover:bg-white hover:text-primary text-base font-semibold">
-                Contact Us
+                Contactez-nous
               </Button>
             </div>
           </div>

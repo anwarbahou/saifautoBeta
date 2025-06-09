@@ -97,7 +97,7 @@ export function CarCard({ car }: { car: CarData }) {
         <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm text-muted-foreground mb-4">
           <div className="flex items-center gap-2">
             <Users className="h-4 w-4 text-primary" />
-            <span>{car.seats || "N/A"} Seats</span>
+            <span>{car.seats || "N/A"} Places</span>
           </div>
           <div className="flex items-center gap-2">
             <Fuel className="h-4 w-4 text-primary" />
@@ -113,11 +113,11 @@ export function CarCard({ car }: { car: CarData }) {
         <div>
           <p className="text-2xl font-bold text-primary">
             {car.price_per_day} MAD
-            <span className="text-sm font-normal text-muted-foreground">/day</span>
+            <span className="text-sm font-normal text-muted-foreground">/jour</span>
           </p>
         </div>
         <Button asChild size="default" className="text-base font-semibold">
-          <Link href={carUrl}>Book Now</Link>
+          <Link href={carUrl}>Réserver</Link>
         </Button>
       </CardFooter>
     </Card>
@@ -142,16 +142,15 @@ export default function NewFleetSection() {
     <section id="fleet" className="py-16 md:py-20 bg-gray-50">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12 md:mb-16">
-          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl mb-4">Explore Our Fleet</h2>
+          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl mb-4">Découvrez Notre Flotte</h2>
           <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-            Choose from our wide range of vehicles to suit your needs and budget. From economy cars for city trips to
-            spacious SUVs for family adventures.
+            Choisissez parmi notre large gamme de véhicules adaptés à vos besoins et à votre budget. Des voitures économiques pour les trajets urbains aux SUV spacieux pour les aventures en famille.
           </p>
         </div>
 
         {loading ? (
           <div className="text-center py-12">
-            <p className="text-muted-foreground">Loading cars...</p>
+            <p className="text-muted-foreground">Chargement des véhicules...</p>
           </div>
         ) : cars && cars.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
@@ -162,17 +161,16 @@ export default function NewFleetSection() {
         ) : (
           <div className="text-center py-12">
             <Car className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-            <h3 className="text-xl font-semibold mb-2">No Cars Available</h3>
+            <h3 className="text-xl font-semibold mb-2">Aucun Véhicule Disponible</h3>
             <p className="text-muted-foreground">
-              We couldn't find any cars at the moment. Please check back later or contact support.
+              Nous n'avons trouvé aucun véhicule pour le moment. Veuillez réessayer plus tard ou contacter le support.
             </p>
           </div>
         )}
 
         <div className="mt-12 md:mt-16 text-center">
           <Button asChild size="lg" className="text-lg font-semibold px-8 py-3">
-            {/* Ensure searchParams is not null before calling toString() */}
-            <Link href={`/fleet${searchParams ? `?${searchParams.toString()}` : ""}`}>View All Cars</Link>
+            <Link href={`/fleet${searchParams ? `?${searchParams.toString()}` : ""}`}>Voir Tous les Véhicules</Link>
           </Button>
         </div>
       </div>

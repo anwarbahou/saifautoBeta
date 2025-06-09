@@ -86,13 +86,13 @@ export default function NewHeroSection() {
           className="grid gap-12 lg:grid-cols-2 lg:gap-16 items-center"
         >
           <div className="flex flex-col justify-center text-white text-center lg:text-left">
-            <h1 className="mb-6 text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl drop-shadow-md">Your Journey Begins Here</h1>
+            <h1 className="mb-6 text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl drop-shadow-md">Votre Voyage Commence Ici</h1>
             <p className="mb-8 max-w-xl text-lg text-gray-200 sm:text-xl mx-auto lg:mx-0 drop-shadow-sm">
-              Discover our premium fleet and enjoy the freedom of the open road with our hassle-free rental service.
+              Découvrez notre flotte premium et profitez de la liberté de la route avec notre service de location sans tracas.
             </p>
             <div className="flex justify-center lg:justify-start mb-10 lg:mb-0">
               <Button asChild size="lg" className="text-lg font-semibold px-8 py-3 bg-primary hover:bg-primary/90 text-primary-foreground">
-                <a href="#contact">Contact Us</a>
+                <a href="#contact">Contactez-nous</a>
               </Button>
             </div>
           </div>
@@ -100,8 +100,8 @@ export default function NewHeroSection() {
           <div className="flex items-center justify-center">
             <Card className="w-full max-w-md shadow-2xl bg-white/90 backdrop-blur-md">
               <CardHeader className="text-center">
-                <CardTitle className="text-2xl">Book Your Dream Car</CardTitle>
-                <CardDescription>Find the perfect vehicle for your adventure</CardDescription>
+                <CardTitle className="text-2xl">Réservez Votre Voiture de Rêve</CardTitle>
+                <CardDescription>Trouvez le véhicule parfait pour votre aventure</CardDescription>
               </CardHeader>
               <CardContent className="p-6 space-y-6">
                 <Form {...form}>
@@ -113,16 +113,15 @@ export default function NewHeroSection() {
                         <FormItem>
                           <FormLabel className="font-semibold">Destination</FormLabel>
                           <div className="relative">
-                            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground z-10" /> {/* Added z-10 */}
+                            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground z-10" />
                             <FormControl>
-                              {/* <Input placeholder="Enter your destination" {...field} className="pl-10 h-12 text-base" /> */}
                               <Select onValueChange={field.onChange} defaultValue={field.value}>
                                 <SelectTrigger className="pl-10 h-12 text-base w-full">
-                                  <SelectValue placeholder="Select your destination" />
+                                  <SelectValue placeholder="Sélectionnez votre destination" />
                                 </SelectTrigger>
                                 <SelectContent>
                                   <SelectItem value="Casablanca">Casablanca</SelectItem>
-                                  <SelectItem value="Casablanca airport">Casablanca airport</SelectItem>
+                                  <SelectItem value="Casablanca airport">Aéroport de Casablanca</SelectItem>
                                 </SelectContent>
                               </Select>
                             </FormControl>
@@ -132,57 +131,43 @@ export default function NewHeroSection() {
                       )}
                     />
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                       <FormField
                         control={form.control}
-                        name="pickupDateTime"
+                        name="pickupDate"
                         render={({ field }) => (
-                          <FormItem className="flex flex-col">
-                            <FormLabel className="font-semibold">Pickup Date & Time</FormLabel>
+                          <FormItem>
+                            <FormLabel className="font-semibold">Date de départ</FormLabel>
                             <FormControl>
                               <DateTimePicker
-                                value={field.value}
-                                onChange={field.onChange}
-                                disabled={(date) => date < new Date(new Date().setHours(0,0,0,0))}
+                                value={field.value ? new Date(field.value) : undefined}
+                                onChange={date => field.onChange(date ? date.toISOString() : "")}
+                                disabled={date => date < new Date(new Date().setHours(0,0,0,0))}
                               />
                             </FormControl>
-                            <FormMessage />
                           </FormItem>
                         )}
                       />
-
                       <FormField
                         control={form.control}
-                        name="dropoffDateTime"
+                        name="returnDate"
                         render={({ field }) => (
-                          <FormItem className="flex flex-col">
-                            <FormLabel className="font-semibold">Return Date & Time</FormLabel>
+                          <FormItem>
+                            <FormLabel className="font-semibold">Date de retour</FormLabel>
                             <FormControl>
                               <DateTimePicker
-                                value={field.value}
-                                onChange={field.onChange}
-                                disabled={(date) => {
-                                  const pickupDateTime = form.getValues("pickupDateTime");
-                                  const today = new Date(new Date().setHours(0,0,0,0));
-                                  if (pickupDateTime) {
-                                    // Prevent selecting a date/time before or on the same day as pickupDateTime,
-                                    // or a time on the same day that is earlier than pickupDateTime's time.
-                                    return date < pickupDateTime;
-                                  }
-                                  return date < today;
-                                }}
+                                value={field.value ? new Date(field.value) : undefined}
+                                onChange={date => field.onChange(date ? date.toISOString() : "")}
+                                disabled={date => date < new Date(new Date().setHours(0,0,0,0))}
                               />
                             </FormControl>
-                            <FormMessage />
                           </FormItem>
                         )}
                       />
                     </div>
 
-                    {/* Removed the old date/time pickers that were in two separate rows */}
-
-                    <Button type="submit" className="w-full h-12 text-lg font-semibold">
-                      Search Available Cars
+                    <Button type="submit" size="lg" className="w-full text-base font-semibold">
+                      Rechercher
                     </Button>
                   </form>
                 </Form>

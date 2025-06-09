@@ -35,8 +35,8 @@ export function TopCars() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Most Popular Cars</CardTitle>
-        <CardDescription>Top performing vehicles in your fleet</CardDescription>
+        <CardTitle>Véhicules les Plus Populaires</CardTitle>
+        <CardDescription>Les véhicules les plus performants de votre flotte</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
@@ -44,7 +44,7 @@ export function TopCars() {
             <div key={car.model} className="space-y-2">
               <div className="flex items-center justify-between">
                 <div className="font-medium">{car.model}</div>
-                <div className="text-sm text-muted-foreground">{car.bookings} bookings</div>
+                <div className="text-sm text-muted-foreground">{car.bookings} réservations</div>
               </div>
               <Progress value={car.percentage} className="h-2" />
             </div>

@@ -3,20 +3,20 @@ import Image from "next/image"
 const cars = [
   {
     name: "Lamborghini Urus",
-    price: "250 MAD/day",
+    price: "250 MAD/jour",
     image: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=400&q=80",
-    mileage: "12,485 miles",
-    fuel: "Petrol",
-    transmission: "Automatic",
+    mileage: "12 485 km",
+    fuel: "Essence",
+    transmission: "Automatique",
     active: true,
   },
   {
-    name: "Mercedes G-Class",
-    price: "220 MAD/day",
+    name: "Mercedes Classe G",
+    price: "220 MAD/jour",
     image: "https://images.unsplash.com/photo-1503736334956-4c8f8e92946d?auto=format&fit=crop&w=400&q=80",
-    mileage: "42,670 miles",
-    fuel: "Petrol",
-    transmission: "Automatic",
+    mileage: "42 670 km",
+    fuel: "Essence",
+    transmission: "Automatique",
     active: false,
   },
 ]
@@ -46,7 +46,7 @@ const CarSlider = () => (
               className={`px-4 py-2 rounded-lg font-semibold shadow transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 ${car.active ? 'bg-blue-700 text-white hover:bg-blue-800' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
               disabled={!car.active}
             >
-              Book Now
+              Réserver
             </button>
           </div>
         </div>

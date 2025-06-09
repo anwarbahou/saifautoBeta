@@ -22,7 +22,7 @@ const testimonials = [
     location: "New York, USA",
     image: "https://randomuser.me/api/portraits/women/44.jpg",
     rating: 5,
-    text: "DriveEasy made our family vacation so much better! The booking process was simple, the car was clean and comfortable, and the customer service was exceptional.",
+    text: "DriveEasy a rendu notre vacances en famille beaucoup plus agréable ! Le processus de réservation était simple, la voiture était propre et confortable, et le service client était exceptionnel.",
   },
   {
     id: 2,
@@ -30,7 +30,7 @@ const testimonials = [
     location: "Toronto, Canada",
     image: "https://randomuser.me/api/portraits/men/32.jpg",
     rating: 5,
-    text: "I travel for business frequently and DriveEasy has become my go-to car rental service. Their fleet is always well-maintained and the pickup/drop-off process is seamless.",
+    text: "Je voyage pour le travail fréquemment et DriveEasy est maintenant mon service de location de voiture préféré. Leur flotte est toujours bien entretenue et le processus de récupération/dépose est fluide.",
   },
   {
     id: 3,
@@ -38,7 +38,7 @@ const testimonials = [
     location: "Miami, USA",
     image: "https://randomuser.me/api/portraits/women/68.jpg",
     rating: 4,
-    text: "Great experience with DriveEasy! The prices are competitive and the cars are newer models with all the features you need. Will definitely use them again.",
+    text: "Une excellente expérience avec DriveEasy ! Les prix sont compétitifs et les voitures sont des modèles plus récents avec tous les fonctionnalités dont vous avez besoin. Je les utiliserai à nouveau.",
   },
   {
     id: 4,
@@ -46,7 +46,7 @@ const testimonials = [
     location: "London, UK",
     image: "https://randomuser.me/api/portraits/men/65.jpg",
     rating: 5,
-    text: "Used DriveEasy for our trip across Europe and couldn't be happier. The cross-border policy was straightforward and the unlimited mileage was a huge plus.",
+    text: "J'ai utilisé DriveEasy pour notre voyage à travers l'Europe et je ne pourrais être plus heureux. La politique transfrontalière était simple et la distance illimitée était un plus.",
   },
   {
     id: 5,
@@ -54,7 +54,7 @@ const testimonials = [
     location: "Chicago, USA",
     image: "https://randomuser.me/api/portraits/women/12.jpg",
     rating: 5,
-    text: "The selection of cars was fantastic, and the website was very easy to navigate. Pick-up was quick and the staff were super friendly and helpful!",
+    text: "La sélection des voitures était fantastique, et le site web était très facile à naviguer. La récupération était rapide et l'équipe était super sympa et utile !",
   },
 ]
 
@@ -67,10 +67,9 @@ export default function NewTestimonialsSection() {
     <section id="testimonials" className="py-16 md:py-20 bg-gray-100">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12 md:mb-16">
-          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl mb-4">What Our Customers Say</h2>
+          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl mb-4">Ce Que Disent Nos Clients</h2>
           <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-            Don't just take our word for it. Here's what our customers have to say about their experience with
-            DriveEasy.
+            Ne vous fiez pas qu'à notre parole. Voici ce que nos clients disent de leur expérience avec DriveEasy.
           </p>
         </div>
 

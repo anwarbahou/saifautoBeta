@@ -41,22 +41,22 @@ export default function NewNavbar() {
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-6">
           <Link href="/fleet" className="text-sm font-medium hover:text-primary transition-colors">
-            Our Fleet
+            Notre Flotte
           </Link>
           <Link href="#how-it-works" className="text-sm font-medium hover:text-primary transition-colors">
-            How It Works
+            Comment ça Marche
           </Link>
           <Link href="#locations" className="text-sm font-medium hover:text-primary transition-colors">
-            Locations
+            Emplacements
           </Link>
           <Link href="#testimonials" className="text-sm font-medium hover:text-primary transition-colors">
-            Testimonials
+            Témoignages
           </Link>
           <Link href="#faq" className="text-sm font-medium hover:text-primary transition-colors">
             FAQ
           </Link>
           <Link href="#contact" className="text-sm font-medium hover:text-primary transition-colors">
-            Contact Us
+            Contactez-nous
           </Link>
         </nav>
 
@@ -66,7 +66,7 @@ export default function NewNavbar() {
           </Link> */}
           {/* Assuming /signup is the route for signing up */}
           <Link href="/login">
-            <Button size="sm">Staff login</Button>
+            <Button size="sm">Connexion Staff</Button>
           </Link>
         </div>
 
@@ -89,34 +89,34 @@ export default function NewNavbar() {
       >
         <nav className="flex flex-col gap-6">
           <Link href="/fleet" className="text-lg font-medium hover:text-primary" onClick={() => setIsMenuOpen(false)}>
-            Our Fleet
+            Notre Flotte
           </Link>
           <Link
             href="#how-it-works"
             className="text-lg font-medium hover:text-primary"
             onClick={() => setIsMenuOpen(false)}
           >
-            How It Works
+            Comment ça Marche
           </Link>
           <Link
             href="#locations"
             className="text-lg font-medium hover:text-primary"
             onClick={() => setIsMenuOpen(false)}
           >
-            Locations
+            Emplacements
           </Link>
           <Link
             href="#testimonials"
             className="text-lg font-medium hover:text-primary"
             onClick={() => setIsMenuOpen(false)}
           >
-            Testimonials
+            Témoignages
           </Link>
           <Link href="#faq" className="text-lg font-medium hover:text-primary" onClick={() => setIsMenuOpen(false)}>
             FAQ
           </Link>
           <Link href="#contact" className="text-lg font-medium hover:text-primary" onClick={() => setIsMenuOpen(false)}>
-            Contact Us
+            Contactez-nous
           </Link>
           <div className="mt-6 flex flex-col gap-4">
             {/* <Link
@@ -128,7 +128,7 @@ export default function NewNavbar() {
             </Link> */}
             {/* Assuming /signup is the route for signing up */}
             <Link href="/login" className="w-full" onClick={() => setIsMenuOpen(false)}>
-                <Button className="w-full">Staff login</Button>
+                <Button className="w-full">Connexion Staff</Button>
             </Link>
           </div>
         </nav>
