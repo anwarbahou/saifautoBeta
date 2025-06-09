@@ -17,8 +17,8 @@ interface Car {
   licensePlate?: string;
   year?: number;
   color?: string | null;
-  category?: string;
-  features?: string[];
+  category: string | null;
+  features: string[] | null;
 }
 
 interface BookingFormProps {

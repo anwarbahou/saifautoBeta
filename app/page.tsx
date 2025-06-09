@@ -3,7 +3,7 @@ import LandingPage from './LandingPage';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 
 export const metadata = {
-  title: "Saifauto - Drive Your Journey, Trust Our Wheels",
+  title: "Saifauto - Commencez votre voyage, faites-nous confiance",
 };
 
 export default function Page() {

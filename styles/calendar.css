@@ -1,0 +1,45 @@
+/* Calendar Dark Mode Styles */
+.dark .rbc-off-range-bg {
+  background: hsl(var(--muted));
+}
+
+.dark .rbc-today {
+  background-color: hsl(var(--accent));
+}
+
+.dark .rbc-header {
+  color: hsl(var(--foreground));
+  border-bottom: 1px solid hsl(var(--border));
+}
+
+.dark .rbc-month-row + .rbc-month-row {
+  border-top: 1px solid hsl(var(--border));
+}
+
+.dark .rbc-day-bg + .rbc-day-bg {
+  border-left: 1px solid hsl(var(--border));
+}
+
+.dark .rbc-month-view {
+  border: 1px solid hsl(var(--border));
+}
+
+.dark .rbc-toolbar button {
+  color: hsl(var(--foreground));
+  border: 1px solid hsl(var(--border));
+}
+
+.dark .rbc-toolbar button:hover {
+  background-color: hsl(var(--accent));
+  border-color: hsl(var(--border));
+}
+
+.dark .rbc-toolbar button.rbc-active {
+  background-color: hsl(var(--accent));
+  border-color: hsl(var(--border));
+}
+
+.dark .rbc-toolbar button.rbc-active:hover {
+  background-color: hsl(var(--accent));
+  border-color: hsl(var(--border));
+} 

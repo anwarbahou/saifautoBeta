@@ -9,6 +9,7 @@ import { getDay } from 'date-fns/getDay';
 import { enUS } from 'date-fns/locale/en-US';
 import { getBookings } from '@/lib/actions'; // Assuming this action fetches all bookings
 import 'react-big-calendar/lib/css/react-big-calendar.css';
+import '@/styles/calendar.css'; // Import custom calendar styles
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { AlertTriangle, Loader2 } from 'lucide-react';
 import { BookingDetailsModal } from '@/components/booking-details-modal'; // Import the modal
@@ -125,15 +126,15 @@ const CalendarPage = () => {
 
   // Custom Event component to add styling based on status
   const CustomEvent: React.FC<EventProps<CalendarEvent>> = ({ event }) => {
-    let backgroundColor = 'bg-blue-500'; // Default color
+    let backgroundColor = 'bg-primary'; // Default color
     if (event.status === 'Confirmed' || event.status === 'Active') {
-      backgroundColor = 'bg-green-500';
+      backgroundColor = 'bg-primary';
     } else if (event.status === 'Pending') {
-      backgroundColor = 'bg-yellow-500';
+      backgroundColor = 'bg-yellow-600';
     } else if (event.status === 'Cancelled') {
-      backgroundColor = 'bg-red-500';
+      backgroundColor = 'bg-destructive';
     } else if (event.status === 'Completed') {
-      backgroundColor = 'bg-gray-500';
+      backgroundColor = 'bg-muted';
     }
 
     return (

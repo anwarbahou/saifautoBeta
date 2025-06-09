@@ -73,7 +73,7 @@ export function CarCard({ car, onEdit, onDelete, onPreview }: CarCardProps) {
   const uniqueDisplayImages = Array.from(new Set(allDisplayImages.filter(img => typeof img === 'string' && img.trim() !== '')));
 
   return (
-    <Card className="flex flex-col overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 group">
+    <Card className="flex flex-col overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 group transform hover:scale-[1.02]">
       <CardHeader className="p-0 relative">
         <div className="w-full relative">
           {uniqueDisplayImages.length > 1 ? (

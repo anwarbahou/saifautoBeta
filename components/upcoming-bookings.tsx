@@ -34,7 +34,7 @@ export function UpcomingBookings() {
       try {
         setLoading(true);
         setError(null);
-        const result = await getUpcomingBookings(3); // Fetch next 3 upcoming
+        const result = await getUpcomingBookings(5); // Fetch next 5 upcoming
         
         if (result.success && result.data) {
           // Map the data if necessary, or use directly if fields match

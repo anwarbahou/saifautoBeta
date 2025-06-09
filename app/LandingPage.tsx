@@ -8,6 +8,7 @@ import NewFooter from "@/components/landing/NewFooter";
 import NewHowItWorksSection from "@/components/landing/NewHowItWorksSection";
 import NewTestimonialsSection from "@/components/landing/NewTestimonialsSection";
 import ContactMapSection from "@/components/landing/ContactMapSection";
+import SlidingPartners from '@/components/landing/SlidingPartners/SlidingPartners';
 
 const LandingPage = () => {
   return (
@@ -15,6 +16,7 @@ const LandingPage = () => {
       <NewNavbar />
       <main className="flex-grow">
         <NewHeroSection />
+        <SlidingPartners />
         <NewFleetSection />
         <NewHowItWorksSection />
         <NewTestimonialsSection />

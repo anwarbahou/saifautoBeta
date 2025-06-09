@@ -77,5 +77,5 @@ export default async function FleetPage() {
 }
 
 export const metadata = {
-  title: "Saifauto - Our Fleet",
+  title: "Saifauto - Notre flotte",
 }; 

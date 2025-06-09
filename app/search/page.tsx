@@ -4,7 +4,7 @@ import NewFooter from '@/components/landing/NewFooter';
 import SearchResultsDisplay from './SearchResultsDisplay';
 
 export const metadata = {
-  title: "Saifauto - Search",
+  title: "Saifauto - Recherche",
 };
 
 export default function SearchPage() {

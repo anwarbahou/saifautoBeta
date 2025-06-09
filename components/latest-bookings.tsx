@@ -79,12 +79,12 @@ export function LatestBookings() {
   };
 
   return (
-    <Card className="col-span-1 lg:col-span-1"> {/* Adjusted for a 3-column layout on lg screens */}
-      <CardHeader>
+    <Card className="col-span-1 lg:col-span-1 h-full flex flex-col">
+      <CardHeader className="flex-none">
         <CardTitle>Latest Bookings</CardTitle>
         <CardDescription>Recently added bookings in your system.</CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="flex-1 min-h-0">
         {loading && (
           <div className="flex items-center justify-center h-40">
             <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -103,36 +103,38 @@ export function LatestBookings() {
           </div>
         )}
         {!loading && !error && bookings.length > 0 && (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Client</TableHead>
-                <TableHead>Car</TableHead>
-                <TableHead className="hidden sm:table-cell">Period</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right hidden md:table-cell">Amount</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {bookings.map((booking) => (
-                <TableRow key={booking.id}>
-                  <TableCell>
-                    <div className="font-medium">{booking.clients?.name || "N/A"}</div>
-                  </TableCell>
-                  <TableCell>{booking.cars ? `${booking.cars.make} ${booking.cars.model}` : "N/A"}</TableCell>
-                  <TableCell className="hidden sm:table-cell">
-                    {new Date(booking.start_date).toLocaleDateString()} - {new Date(booking.end_date).toLocaleDateString()}
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={getStatusBadgeVariant(booking.status)}>{booking.status}</Badge>
-                  </TableCell>
-                  <TableCell className="text-right hidden md:table-cell">
-                    {booking.total_amount ? `${booking.total_amount.toFixed(2)} MAD` : "-"}
-                  </TableCell>
+          <div className="overflow-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Client</TableHead>
+                  <TableHead>Car</TableHead>
+                  <TableHead className="hidden sm:table-cell">Period</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right hidden md:table-cell">Amount</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {bookings.map((booking) => (
+                  <TableRow key={booking.id}>
+                    <TableCell className="whitespace-nowrap">
+                      <div className="font-medium">{booking.clients?.name || "N/A"}</div>
+                    </TableCell>
+                    <TableCell className="whitespace-nowrap">{booking.cars ? `${booking.cars.make} ${booking.cars.model}` : "N/A"}</TableCell>
+                    <TableCell className="hidden sm:table-cell whitespace-nowrap">
+                      {new Date(booking.start_date).toLocaleDateString()} - {new Date(booking.end_date).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={getStatusBadgeVariant(booking.status)}>{booking.status}</Badge>
+                    </TableCell>
+                    <TableCell className="text-right hidden md:table-cell whitespace-nowrap">
+                      {booking.total_amount ? `${booking.total_amount.toFixed(2)} MAD` : "-"}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         )}
       </CardContent>
     </Card>

@@ -1,11 +1,11 @@
 import { useEffect } from 'react';
 
 const titles = [
-  'Saifauto - Your journey starts here',
-  '🔥 Best Car Rental Deals!',
-  '💰 Unbeatable Prices!',
-  '🚗 Premium Cars Available',
-  '⚡ Book Now & Save!',
+  'Saifauto - Commencez votre voyage ici',
+  '🔥 Meilleures offres de location de voitures !',
+  '💰 Prix imbattables !',
+  '🚗 Voitures premium disponibles',
+  '⚡ Réservez maintenant et économisez !',
 ];
 
 export function useBlinkingTitle(defaultTitle: string) {

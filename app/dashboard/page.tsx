@@ -5,11 +5,10 @@ import { UtilizationChart } from "@/components/utilization-chart"
 import { LatestBookings } from "@/components/latest-bookings"
 import { RecentlyAddedCars } from "@/components/recently-added-cars"
 import { RecentWhatsappMessages } from "@/components/recent-whatsapp-messages"
-import { CarStatusOverview } from "@/components/car-status-overview"
 import { UpcomingBookings } from "@/components/upcoming-bookings"
 
 export const metadata = {
-  title: "Saifauto - Dashboard",
+  title: "Saifauto - Tableau de bord",
 };
 
 export default function DashboardPage() {
@@ -19,15 +18,14 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <OverviewStats />
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[500px] h-full">
         <RevenueChart />
         <UtilizationChart />
         <LatestBookings />
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <RecentlyAddedCars />
         <RecentWhatsappMessages />
-        <CarStatusOverview />
         <UpcomingBookings />
       </div>
     </div>

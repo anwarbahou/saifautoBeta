@@ -103,10 +103,10 @@ export function CarsList() {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false)
   const { toast } = useToast()
 
-  const [selectedMake, setSelectedMake] = useState<string | null>(null)
-  const [selectedModel, setSelectedModel] = useState<string | null>(null)
-  const [selectedYear, setSelectedYear] = useState<number | null>(null)
-  const [selectedStatus, setSelectedStatus] = useState<string | null>(null)
+  const [selectedMake, setSelectedMake] = useState<string | undefined>(undefined)
+  const [selectedModel, setSelectedModel] = useState<string | undefined>(undefined)
+  const [selectedYear, setSelectedYear] = useState<string>("all")
+  const [selectedStatus, setSelectedStatus] = useState<string | undefined>(undefined)
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const itemsPerPage = 12;
@@ -166,10 +166,10 @@ export function CarsList() {
         car.model.toLowerCase().includes(searchTerm.toLowerCase()) ||
         (car.license_plate && car.license_plate.toLowerCase().includes(searchTerm.toLowerCase()));
 
-      const matchesMake = selectedMake ? car.make === selectedMake : true;
-      const matchesModel = selectedModel ? car.model === selectedModel : true;
-      const matchesYear = selectedYear ? car.year === selectedYear : true;
-      const matchesStatus = selectedStatus ? car.status === selectedStatus : true;
+      const matchesMake = selectedMake === "all" || selectedMake === undefined ? true : car.make === selectedMake;
+      const matchesModel = selectedModel === "all" || selectedModel === undefined ? true : car.model === selectedModel;
+      const matchesYear = selectedYear === "all" ? true : car.year?.toString() === selectedYear;
+      const matchesStatus = selectedStatus === "all" || selectedStatus === undefined ? true : car.status === selectedStatus;
 
       return matchesSearchTerm && matchesMake && matchesModel && matchesYear && matchesStatus;
     });
@@ -301,10 +301,10 @@ export function CarsList() {
 
   const handleResetFilters = () => {
     setSearchTerm("");
-    setSelectedMake(null);
-    setSelectedModel(null);
-    setSelectedYear(null);
-    setSelectedStatus(null);
+    setSelectedMake(undefined);
+    setSelectedModel(undefined);
+    setSelectedYear("all");
+    setSelectedStatus(undefined);
     setCurrentPage(1); // Reset to page 1 when filters are reset
     // loadCars(1); // Fetch data for page 1 with cleared filters (if filters were server-side)
   };
@@ -398,48 +398,48 @@ export function CarsList() {
             />
           </div>
           <div className="flex flex-wrap items-center gap-2 md:gap-4">
-            <Select value={selectedMake} onValueChange={setSelectedMake}>
+            <Select value={selectedMake || "all"} onValueChange={setSelectedMake}>
               <SelectTrigger className="w-full sm:w-[180px]">
                 <SelectValue placeholder="Marque" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Toutes les marques</SelectItem>
+                <SelectItem value="all">Toutes les marques</SelectItem>
                 {Array.from(new Set(allFetchedCars.map(car => car.make))).sort().map(make => (
                   <SelectItem key={make} value={make}>{make}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
 
-            <Select value={selectedModel} onValueChange={setSelectedModel}>
+            <Select value={selectedModel || "all"} onValueChange={setSelectedModel}>
               <SelectTrigger className="w-full sm:w-[180px]">
                 <SelectValue placeholder="Modèle" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Tous les modèles</SelectItem>
+                <SelectItem value="all">Tous les modèles</SelectItem>
                 {Array.from(new Set(allFetchedCars.map(car => car.model))).sort().map(model => (
                   <SelectItem key={model} value={model}>{model}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
 
-            <Select value={selectedYear?.toString()} onValueChange={(value) => setSelectedYear(value ? parseInt(value) : null)}>
+            <Select value={selectedYear} onValueChange={setSelectedYear}>
               <SelectTrigger className="w-full sm:w-[180px]">
                 <SelectValue placeholder="Année" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Toutes les années</SelectItem>
+                <SelectItem value="all">Toutes les années</SelectItem>
                 {Array.from(new Set(allFetchedCars.map(car => car.year))).sort().map(year => (
-                  <SelectItem key={year} value={year?.toString() || ""}>{year}</SelectItem>
+                  <SelectItem key={year} value={year?.toString()}>{year}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
 
-            <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+            <Select value={selectedStatus || "all"} onValueChange={setSelectedStatus}>
               <SelectTrigger className="w-full sm:w-[180px]">
                 <SelectValue placeholder="État" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Tous les états</SelectItem>
+                <SelectItem value="all">Tous les états</SelectItem>
                 <SelectItem value="Available">Disponible</SelectItem>
                 <SelectItem value="Rented">Loué</SelectItem>
                 <SelectItem value="Maintenance">En maintenance</SelectItem>

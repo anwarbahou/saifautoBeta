@@ -3,7 +3,7 @@ import { CarsList } from "@/components/cars-list"
 import { DashboardShell } from "@/components/dashboard-shell"
 
 export const metadata = {
-  title: "Saifauto - Cars",
+  title: "Saifauto - Voitures",
 };
 
 export default function CarsPage() {

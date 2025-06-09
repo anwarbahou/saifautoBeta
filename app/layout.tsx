@@ -16,7 +16,7 @@ export const viewport: Viewport = {
 
 // Default metadata without title (since we'll handle it dynamically)
 export const metadata: Metadata = {
-  description: 'Premium car rental service for all your travel needs',
+  description: 'Service de location de voitures premium pour tous vos besoins de voyage',
   icons: {
     icon: [
       {
@@ -49,12 +49,12 @@ export default function RootLayout({
   const isDev = process.env.NODE_ENV === 'development'
 
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="fr" suppressHydrationWarning>
       <head>
-        <title>Saifauto - Your journey starts here</title>
+        <title>Saifauto - Commencez votre voyage ici</title>
       </head>
       <body suppressHydrationWarning>
-        <BlinkingTitle defaultTitle="Saifauto - Your journey starts here" />
+        <BlinkingTitle defaultTitle="Saifauto - Commencez votre voyage ici" />
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           {isDev && <StagewiseToolbarWrapper />}
           {children}
