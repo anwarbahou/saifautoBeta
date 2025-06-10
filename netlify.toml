@@ -1,5 +1,5 @@
 [build]
-  command = "npm --loglevel verbose install && npm run build"
+  command = "npm install && npm run build"
   publish = ".next"
 
 [build.environment]
@@ -7,8 +7,10 @@
   NODE_ENV = "production"
   CI = "true"
   NEXT_TELEMETRY_DISABLED = "1"
-  NPM_FLAGS = "--no-audit --no-fund --prefer-offline"
+  NETLIFY_USE_PNPM = "false"
   NETLIFY_USE_NPM = "true"
+  NETLIFY_USE_YARN = "false"
+  NPM_FLAGS = "--legacy-peer-deps"
   NETLIFY_NEXT_PLUGIN_SKIP = "true"
 
 [[plugins]]

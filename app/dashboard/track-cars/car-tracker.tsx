@@ -3,8 +3,9 @@
 import { useEffect, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import dynamic from 'next/dynamic';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import type { LatLngExpression } from 'leaflet';
+import { createBrowserClient } from '@supabase/ssr';
+import { Database } from '@/types/supabase';
+import { CarLocation, CarData } from '@/types/cars';
 
 // Dynamically import the Map component with no SSR
 const Map = dynamic(() => import('./map'), {
@@ -14,20 +15,14 @@ const Map = dynamic(() => import('./map'), {
   ),
 });
 
-interface CarLocation {
-  id: number;
-  make: string;
-  model: string;
-  location: LatLngExpression;
-  status: string;
-  license_plate?: string;
-}
-
 export function CarTracker() {
   const [cars, setCars] = useState<CarLocation[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const supabase = createClientComponentClient();
+  const supabase = createBrowserClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
 
   useEffect(() => {
     fetchCars();
@@ -38,7 +33,8 @@ export function CarTracker() {
       setError(null);
       const { data, error } = await supabase
         .from('cars')
-        .select('id, make, model, status, license_plate, location');
+        .select('id, make, model, status, license_plate, location')
+        .returns<CarData[]>();
 
       if (error) {
         console.error('Error fetching cars:', error);
@@ -48,8 +44,8 @@ export function CarTracker() {
 
       // Transform the data to match our CarLocation interface
       const transformedCars = data
-        .filter(car => car.location) // Only include cars with location data
-        .map(car => {
+        .filter((car): car is CarData => Boolean(car.location)) // Only include cars with location data
+        .map((car) => {
           try {
             // Try to parse the location string
             const [lat, lng] = car.location?.split(',').map(Number) || [33.5784, -7.7022];
@@ -60,20 +56,22 @@ export function CarTracker() {
               return null;
             }
 
-            return {
+            const carLocation: CarLocation = {
               id: car.id,
               make: car.make,
               model: car.model,
               status: car.status || 'Unknown',
               license_plate: car.license_plate,
-              location: [lat, lng] as [number, number]
+              location: [lat, lng]
             };
+
+            return carLocation;
           } catch (err) {
             console.warn(`Error parsing location for car ${car.id}:`, err);
             return null;
           }
         })
-        .filter(car => car !== null) as CarLocation[];
+        .filter((car): car is CarLocation => car !== null);
 
       setCars(transformedCars);
     } catch (error) {

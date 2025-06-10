@@ -16,10 +16,7 @@ const nextConfig = {
   },
   eslint: {
     ignoreDuringBuilds: true,
-  },
-  tracing: {
-    ignoreRootSpans: true,
-  },
+  }
 }
 
 module.exports = nextConfig 

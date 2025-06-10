@@ -3,10 +3,11 @@
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
-import type { LatLngExpression } from 'leaflet';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createBrowserClient } from '@supabase/ssr';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
+import { Database } from '@/types/supabase';
+import { CarLocation } from '@/types/cars';
 
 // Custom SVG marker icon
 const icon = L.divIcon({
@@ -41,15 +42,6 @@ if (typeof window !== 'undefined') {
   document.head.appendChild(style);
 }
 
-interface CarLocation {
-  id: number;
-  make: string;
-  model: string;
-  location: LatLngExpression;
-  status: string;
-  license_plate?: string;
-}
-
 interface MapProps {
   cars: CarLocation[];
   onCarUpdate?: (carId: number) => void;
@@ -60,7 +52,10 @@ const CASABLANCA_CENTER: [number, number] = [33.5784, -7.7022];
 
 export default function Map({ cars, onCarUpdate }: MapProps) {
   const [disabling, setDisabling] = useState<number | null>(null);
-  const supabase = createClientComponentClient();
+  const supabase = createBrowserClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
 
   const handleDisableCar = async (carId: number) => {
     try {
