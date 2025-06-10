@@ -6,6 +6,7 @@ import { toast } from "react-hot-toast";
 import { Button } from "@/components/ui/button";
 import { DateTimePicker } from "@/components/ui/DateTimePicker";
 import { Loader2 } from "lucide-react";
+import { Dialog, DialogContent, DialogOverlay, DialogTitle } from "@/components/ui/dialog";
 
 interface Car {
   id: string | number;
@@ -215,77 +216,68 @@ const BookingForm = ({ car, initialPickupDate = "", initialReturnDate = "", init
   return (
     <>
       {/* Rules Modal */}
-      {showRulesModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 max-[820px]:inset-0 max-[820px]:w-screen max-[820px]:h-screen max-[820px]:items-start max-[820px]:justify-start">
-          <div className="bg-white shadow-2xl border border-gray-200 w-full max-w-[800px] p-6 relative max-h-[calc(100vh-4rem)] overflow-y-auto rounded-xl max-[820px]:w-screen max-[820px]:h-screen max-[820px]:rounded-none max-[820px]:p-0 max-[820px]:overflow-y-auto">
-            <header className="mb-4">
-              <h1 className="text-2xl font-bold text-center mb-1">Official Rental Rules & Laws of Morocco</h1>
-              <p className="text-center text-base text-gray-700 italic">Please read carefully before proceeding with your booking</p>
-            </header>
-            <div className="space-y-2 mb-6">
-              <AccordionSection title="General Requirements">
-                <ul className="list-disc pl-5 mb-2">
-                  <li>Driver must be at least <b>21 years old</b> and hold a valid driver's license for at least 1 year.</li>
-                  <li>International drivers require a valid passport and international driving permit.</li>
-                  <li>Rental agreements must be signed in person with valid identification.</li>
-                </ul>
-              </AccordionSection>
-              <AccordionSection title="Traffic Laws & Safety">
-                <ul className="list-disc pl-5 mb-2">
-                  <li>Seat belts are mandatory for all passengers at all times.</li>
-                  <li>Driving under the influence of alcohol or drugs is strictly prohibited and subject to severe penalties.</li>
-                  <li>Observe all Moroccan traffic laws and posted speed limits (typically 60 km/h in cities, 100 km/h on highways).</li>
-                  <li>Use of mobile phones while driving is prohibited unless using a hands-free system.</li>
-                </ul>
-              </AccordionSection>
-              <AccordionSection title="Rental & Return Policies">
-                <ul className="list-disc pl-5 mb-2">
-                  <li>Return the car with the same fuel level as at pickup; refueling charges may apply.</li>
-                  <li>Report any accidents or damages immediately to the rental agency and local authorities.</li>
-                  <li>Late returns may incur additional charges.</li>
-                  <li>Smoking is not permitted in rental vehicles.</li>
-                </ul>
-              </AccordionSection>
-              <AccordionSection title="Insurance & Liability">
-                <ul className="list-disc pl-5 mb-2">
-                  <li>Basic insurance is included; additional coverage is available upon request.</li>
-                  <li>The renter is responsible for all traffic fines and violations during the rental period.</li>
-                  <li>Loss of keys or documents may result in extra charges.</li>
-                </ul>
-              </AccordionSection>
-            </div>
-            <footer className="mt-4 mb-2">
-              <p className="text-sm text-gray-700">By proceeding, you acknowledge that you have read and understood the official rules and laws governing car rentals in Morocco. Failure to comply may result in penalties or cancellation of your rental agreement.</p>
-            </footer>
-            <label htmlFor="rulesInput" className="block mt-4 mb-2 font-medium text-gray-900">Type <span className="font-mono bg-gray-100 px-1 rounded">i understand</span> to proceed:</label>
-            <input
-              id="rulesInput"
-              type="text"
-              value={rulesInput}
-              onChange={e => setRulesInput(e.target.value)}
-              className="w-full border border-gray-300 rounded px-3 py-2 mb-4 bg-white text-black focus:outline-none focus:ring-2 focus:ring-primary"
-              aria-label="Acknowledge rules"
-              autoFocus
-            />
-            <Button
-              onClick={handleRulesConfirm}
-              disabled={rulesInput.trim().toLowerCase() !== "i understand"}
-              className="w-full"
-              aria-label="Confirm rules and proceed"
-            >
-              I Understand & Proceed
-            </Button>
-            <button
-              onClick={() => setShowRulesModal(false)}
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-2xl"
-              aria-label="Close rules modal"
-              tabIndex={0}
-            >
-              ×
-            </button>
+      <Dialog open={showRulesModal} onOpenChange={setShowRulesModal}>
+        <DialogContent className="max-w-[800px] w-full p-6 max-h-[calc(100vh-4rem)] overflow-y-auto rounded-xl">
+          <DialogTitle>Official Rental Rules & Laws of Morocco</DialogTitle>
+          <header className="mb-4">
+            <h1 className="text-2xl font-bold text-center mb-1">Official Rental Rules & Laws of Morocco</h1>
+            <p className="text-center text-base text-gray-700 italic">Please read carefully before proceeding with your booking</p>
+          </header>
+          <div className="space-y-2 mb-6">
+            <AccordionSection title="General Requirements">
+              <ul className="list-disc pl-5 mb-2">
+                <li>Driver must be at least <b>21 years old</b> and hold a valid driver's license for at least 1 year.</li>
+                <li>International drivers require a valid passport and international driving permit.</li>
+                <li>Rental agreements must be signed in person with valid identification.</li>
+              </ul>
+            </AccordionSection>
+            <AccordionSection title="Traffic Laws & Safety">
+              <ul className="list-disc pl-5 mb-2">
+                <li>Seat belts are mandatory for all passengers at all times.</li>
+                <li>Driving under the influence of alcohol or drugs is strictly prohibited and subject to severe penalties.</li>
+                <li>Observe all Moroccan traffic laws and posted speed limits (typically 60 km/h in cities, 100 km/h on highways).</li>
+                <li>Use of mobile phones while driving is prohibited unless using a hands-free system.</li>
+              </ul>
+            </AccordionSection>
+            <AccordionSection title="Rental & Return Policies">
+              <ul className="list-disc pl-5 mb-2">
+                <li>Return the car with the same fuel level as at pickup; refueling charges may apply.</li>
+                <li>Report any accidents or damages immediately to the rental agency and local authorities.</li>
+                <li>Late returns may incur additional charges.</li>
+                <li>Smoking is not permitted in rental vehicles.</li>
+              </ul>
+            </AccordionSection>
+            <AccordionSection title="Insurance & Liability">
+              <ul className="list-disc pl-5 mb-2">
+                <li>Basic insurance is included; additional coverage is available upon request.</li>
+                <li>The renter is responsible for all traffic fines and violations during the rental period.</li>
+                <li>Loss of keys or documents may result in extra charges.</li>
+              </ul>
+            </AccordionSection>
           </div>
-        </div>
-      )}
+          <footer className="mt-4 mb-2">
+            <p className="text-sm text-gray-700">By proceeding, you acknowledge that you have read and understood the official rules and laws governing car rentals in Morocco. Failure to comply may result in penalties or cancellation of your rental agreement.</p>
+          </footer>
+          <label htmlFor="rulesInput" className="block mt-4 mb-2 font-medium text-gray-900">Type <span className="font-mono bg-gray-100 px-1 rounded">i understand</span> to proceed:</label>
+          <input
+            id="rulesInput"
+            type="text"
+            value={rulesInput}
+            onChange={e => setRulesInput(e.target.value)}
+            className="w-full border border-gray-300 rounded px-3 py-2 mb-4 bg-white text-black focus:outline-none focus:ring-2 focus:ring-primary"
+            aria-label="Acknowledge rules"
+            autoFocus
+          />
+          <Button
+            onClick={handleRulesConfirm}
+            disabled={rulesInput.trim().toLowerCase() !== "i understand"}
+            className="w-full"
+            aria-label="Confirm rules and proceed"
+          >
+            I Understand & Proceed
+          </Button>
+        </DialogContent>
+      </Dialog>
       <form onSubmit={handleSubmit} className="space-y-6">
         {error && (
           <div className="p-3 rounded bg-red-50 border border-red-200 text-red-600 text-sm">

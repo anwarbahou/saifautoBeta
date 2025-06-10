@@ -147,12 +147,12 @@ export default async function CarDetailsPage({ params, searchParams }: CarDetail
           <div className="md:col-span-2">
             <div className="grid gap-8">
               {/* Car Images */}
-              <div className="aspect-[16/9] relative rounded-lg overflow-hidden bg-muted">
+              <div className="aspect-[16/9] relative rounded-lg overflow-hidden bg-muted z-0">
                 <Image
                   src={car.primary_image || "/img/cars/car-placeholder.png"}
                   alt={car.name}
                   fill
-                  className="object-cover"
+                  className="object-cover z-[1] pointer-events-none"
                   priority
                 />
               </div>
