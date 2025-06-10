@@ -15,13 +15,13 @@ export default function ContactMapSection() {
   };
 
   return (
-    <section className="py-12 md:py-20 bg-gray-50 dark:bg-gray-800/50" id="contact">
+    <section className="py-12 md:py-20 bg-gray-50" id="contact">
       <div className="container mx-auto px-4 md:px-6">
         <div className="text-center mb-10 md:mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-gray-900 dark:text-white">
+          <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-gray-900">
             Find Us & Get In Touch
           </h2>
-          <p className="mt-3 text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+          <p className="mt-3 text-lg text-gray-600 max-w-2xl mx-auto">
             Visit our office or contact us for any inquiries. We're here to help you with your car rental needs.
           </p>
         </div>
@@ -44,20 +44,20 @@ export default function ContactMapSection() {
           {/* Contact Info Section */}
           <div className="space-y-6">
             <div>
-              <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Contact Details</h3>
+              <h3 className="text-2xl font-semibold text-gray-900 mb-4">Contact Details</h3>
               <div className="space-y-4">
                 <div className="flex items-start gap-4">
                   <MapPin className="h-6 w-6 text-primary flex-shrink-0 mt-1" />
                   <div>
-                    <h4 className="font-medium text-gray-800 dark:text-gray-100">Our Office</h4>
-                    <p className="text-gray-600 dark:text-gray-300">{contactInfo.address}</p>
+                    <h4 className="font-medium text-gray-800">Our Office</h4>
+                    <p className="text-gray-600">{contactInfo.address}</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
                   <Phone className="h-6 w-6 text-primary flex-shrink-0 mt-1" />
                   <div>
-                    <h4 className="font-medium text-gray-800 dark:text-gray-100">Call Us</h4>
-                    <p className="text-gray-600 dark:text-gray-300 hover:text-primary transition-colors">
+                    <h4 className="font-medium text-gray-800">Call Us</h4>
+                    <p className="text-gray-600 hover:text-primary transition-colors">
                       <a href={`tel:${contactInfo.phone}`}>{contactInfo.phone}</a>
                     </p>
                   </div>
@@ -65,8 +65,8 @@ export default function ContactMapSection() {
                 <div className="flex items-start gap-4">
                   <Mail className="h-6 w-6 text-primary flex-shrink-0 mt-1" />
                   <div>
-                    <h4 className="font-medium text-gray-800 dark:text-gray-100">Email Us</h4>
-                    <p className="text-gray-600 dark:text-gray-300 hover:text-primary transition-colors">
+                    <h4 className="font-medium text-gray-800">Email Us</h4>
+                    <p className="text-gray-600 hover:text-primary transition-colors">
                       <a href={`mailto:${contactInfo.email}`}>{contactInfo.email}</a>
                     </p>
                   </div>

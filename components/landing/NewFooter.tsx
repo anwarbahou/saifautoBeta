@@ -79,14 +79,10 @@ export default function NewFooter() {
           </div>
         </div>
         <div className="border-t border-gray-700 mt-10 pt-8 text-sm text-center text-gray-400">
-          <p>&copy; {new Date().getFullYear()} Saifauto Car Rentals. All rights reserved. Designed with passion.</p>
+          <p className="text-gray-400">&copy; {new Date().getFullYear()} Saifauto Car Rentals. All rights reserved. Designed with passion.</p>
         </div>
       </div>
-      <style jsx global>{`
-        .footer-logo {
-          filter: brightness(0) invert(1);
-        }
-      `}</style>
+      <style jsx global>{``}</style>
     </footer>
   )
 } 

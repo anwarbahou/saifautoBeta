@@ -39,12 +39,12 @@ const PopularCars = () => (
       <h2 className="text-3xl md:text-4xl font-bold text-center mb-10 text-gray-900">Voitures Populaires</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
         {cars.map((car, i) => (
-          <div key={i} className="bg-white rounded-xl shadow p-4 flex flex-col items-center">
+          <div key={i} className="bg-gray-100 rounded-xl shadow p-4 flex flex-col items-center">
             <div className="w-full h-40 relative mb-4 rounded-lg overflow-hidden">
               <Image src={car.image} alt={car.name} fill className="object-cover" />
             </div>
             <h3 className="text-lg font-semibold text-gray-900">{car.name}</h3>
-            <p className="text-blue-700 font-bold text-xl mt-2">{car.price}</p>
+            <p className="text-primary font-bold text-xl mt-2">{car.price}</p>
           </div>
         ))}
       </div>

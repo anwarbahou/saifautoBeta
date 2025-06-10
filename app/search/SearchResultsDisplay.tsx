@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabaseClient';
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -35,10 +35,16 @@ async function fetchAllCars(): Promise<SharedCar[]> {
   }));
 }
 
+// NOTE: This component always fetches the latest car list from Supabase on every load.
+// No static or cached data is used. If a car is removed from the database, it will not appear in the search results.
+// If a car is added, it will appear immediately on reload.
+
 const SearchResultsDisplay = () => {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [cars, setCars] = useState<SharedCar[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const destination = searchParams ? searchParams.get('destination') : null;
   const pickupDateTime = searchParams ? searchParams.get('pickupDateTime') : null;
@@ -53,19 +59,33 @@ const SearchResultsDisplay = () => {
   }, []);
 
   const handlePreview = useCallback((car: SharedCar) => {
-    console.log("Preview car:", car.id);
+    console.log('[Preview] Car object:', car);
     if (searchParams) {
       const carUrl = `/cars/${car.id}?${searchParams.toString()}`;
-      window.location.href = carUrl;
+      console.log('[Preview] Navigating to:', carUrl, 'with searchParams:', searchParams.toString());
+      router.push(carUrl);
+    } else {
+      console.warn('[Preview] No searchParams found, navigating to car page without params.');
+      router.push(`/cars/${car.id}`);
     }
-  }, [searchParams]);
+  }, [searchParams, router]);
 
   useEffect(() => {
     async function loadCars() {
       setLoading(true);
-      const fetchedCars = await fetchAllCars();
-      setCars(fetchedCars);
-      setLoading(false);
+      setError(null);
+      try {
+        console.log('[Search] Params:', { destination, pickupDateTime, dropoffDateTime });
+        // Always fetch the latest cars from Supabase
+        const fetchedCars = await fetchAllCars();
+        console.log('[Search] Cars fetched:', fetchedCars.length, fetchedCars);
+        setCars(fetchedCars);
+        setLoading(false);
+      } catch (err) {
+        console.error('[Search] Error fetching or filtering cars:', err);
+        setError('Une erreur est survenue lors du chargement des voitures. Veuillez réessayer plus tard.');
+        setLoading(false);
+      }
     }
     loadCars();
   }, [destination, pickupDateTime, dropoffDateTime]);
@@ -84,6 +104,11 @@ const SearchResultsDisplay = () => {
         <p className="mb-6 text-md text-gray-600">
           Du : <strong>{new Date(pickupDateTime).toISOString().slice(0, 19).replace('T', ' ')}</strong> Au : <strong>{new Date(dropoffDateTime).toISOString().slice(0, 19).replace('T', ' ')}</strong>
         </p>
+      )}
+      {error && (
+        <div className="text-center py-6">
+          <p className="text-lg text-red-600">{error}</p>
+        </div>
       )}
 
       {loading ? (

@@ -34,24 +34,26 @@ async function fetchCarDetails(id: string): Promise<CarDetailsData | null> {
   try {
     const { data: car_data, error } = await supabase
       .from('cars')
-      // Removed seats, fuel_type, transmission from select as they don't exist
-      .select('id, make, model, year, color, category, daily_rate, primary_image, images, status, features') 
+      .select('id, make, model, year, color, category, daily_rate, primary_image, images, status') 
       .eq('id', id)
       .single();
 
+    console.log(`[fetchCarDetails] Raw car_data for ID ${id}:`, car_data);
+
     if (error) {
-      console.error(`Error fetching car details for ID ${id}:`, error);
-      // Add more detailed logging from the error object if available
+      console.error(`[fetchCarDetails] Error fetching car details for ID ${id}:`, error);
+      console.error(`[fetchCarDetails] Full Supabase response for ID ${id}:`, { data: car_data, error });
       if (error.message) console.error("Supabase error message:", error.message);
       if (error.details) console.error("Supabase error details:", error.details);
       if (error.hint) console.error("Supabase error hint:", error.hint);
       return null;
     }
     if (!car_data) {
-      console.warn(`No car found with ID ${id}.`);
+      console.warn(`[fetchCarDetails] No car found with ID ${id}. Supabase response:`, { data: car_data, error });
       return null;
     }
 
+    // Defensive: Provide safe defaults for missing/null fields
     return {
       id: car_data.id,
       make: car_data.make || "Unknown Make",
@@ -59,17 +61,17 @@ async function fetchCarDetails(id: string): Promise<CarDetailsData | null> {
       name: `${car_data.make || ''} ${car_data.model || ''}`.trim() || "Unknown Car",
       type: car_data.category || "N/A",
       year: car_data.year ?? undefined,
-      color: car_data.color,
+      color: car_data.color || null,
       daily_rate: car_data.daily_rate || 0,
-      image_url: car_data.primary_image,
-      images: car_data.images,
+      image_url: car_data.primary_image || "/img/cars/car-placeholder.png",
+      images: Array.isArray(car_data.images) ? car_data.images : [],
       seats: null, // Explicitly null as not fetched
       fuel_type: null, // Explicitly null as not fetched
       transmission: null, // Explicitly null as not fetched
-      status: car_data.status,
-      category: car_data.category,
-      primary_image: car_data.primary_image,
-      features: car_data.features,
+      status: car_data.status || "Unknown",
+      category: car_data.category || null,
+      primary_image: car_data.primary_image || "/img/cars/car-placeholder.png",
+      features: [], // Column does not exist in DB, so always empty
     };
   } catch (err) {
     console.error(`Exception during fetchCarDetails for ID ${id}:`, err);

@@ -27,7 +27,7 @@ const CarSlider = () => (
       {cars.map((car, i) => (
         <div
           key={i}
-          className={`flex-1 rounded-2xl p-6 flex flex-col items-center shadow-lg border transition-all duration-200 ${car.active ? 'bg-white border-blue-600' : 'bg-gray-100 border-gray-200 opacity-60'}`}
+          className={`flex-1 rounded-2xl p-6 flex flex-col items-center shadow-lg border transition-all duration-200 ${car.active ? 'bg-white border-primary' : 'bg-gray-100 border-gray-200 opacity-60'}`}
         >
           <div className="w-40 h-24 relative mb-4">
             <Image src={car.image} alt={car.name} fill className="object-contain" />
@@ -35,20 +35,18 @@ const CarSlider = () => (
           <div className="flex items-center gap-2 mb-2">
             <span className="font-semibold text-lg text-gray-900">{car.name}</span>
           </div>
-          <div className="flex gap-4 text-xs text-gray-500 mb-4">
+          <div className="flex gap-4 text-xs text-gray-700 mb-4">
             <span>{car.mileage}</span>
             <span>{car.fuel}</span>
             <span>{car.transmission}</span>
           </div>
-          <div className="flex items-center gap-2 w-full justify-between">
-            <span className="text-blue-700 font-bold text-xl">{car.price}</span>
-            <button
-              className={`px-4 py-2 rounded-lg font-semibold shadow transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 ${car.active ? 'bg-blue-700 text-white hover:bg-blue-800' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
-              disabled={!car.active}
-            >
-              Réserver
-            </button>
-          </div>
+          <span className="text-primary font-bold text-xl">{car.price}</span>
+          <button
+            className={`px-4 py-2 rounded-lg font-semibold shadow transition-colors focus:outline-none focus:ring-2 focus:ring-primary ${car.active ? 'bg-primary text-white hover:bg-primary/90' : 'bg-gray-200 text-gray-500 cursor-not-allowed'}`}
+            disabled={!car.active}
+          >
+            Réserver
+          </button>
         </div>
       ))}
     </div>

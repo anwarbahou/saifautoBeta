@@ -75,7 +75,7 @@ export default function NewHeroSection() {
           priority
           quality={100}
         />
-        <div className="absolute inset-0 bg-black/50" /> {/* Slightly adjusted overlay for better contrast */}
+        <div className="absolute inset-0 bg-black/50" /> {/* Light overlay for better contrast */}
       </div>
 
       <div className="container relative z-10 mx-auto px-4 py-16 sm:px-6">
@@ -87,7 +87,7 @@ export default function NewHeroSection() {
         >
           <div className="flex flex-col justify-center text-white text-center lg:text-left">
             <h1 className="mb-6 text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl drop-shadow-md">Votre Voyage Commence Ici</h1>
-            <p className="mb-8 max-w-xl text-lg text-gray-200 sm:text-xl mx-auto lg:mx-0 drop-shadow-sm">
+            <p className="mb-8 max-w-xl text-lg text-gray-100 sm:text-xl mx-auto lg:mx-0 drop-shadow-sm">
               Découvrez notre flotte premium et profitez de la liberté de la route avec notre service de location sans tracas.
             </p>
             <div className="flex justify-center lg:justify-start mb-10 lg:mb-0">
@@ -134,14 +134,14 @@ export default function NewHeroSection() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                       <FormField
                         control={form.control}
-                        name="pickupDate"
+                        name="pickupDateTime"
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel className="font-semibold">Date de départ</FormLabel>
                             <FormControl>
                               <DateTimePicker
                                 value={field.value ? new Date(field.value) : undefined}
-                                onChange={date => field.onChange(date ? date.toISOString() : "")}
+                                onChange={date => field.onChange(date ?? undefined)}
                                 disabled={date => date < new Date(new Date().setHours(0,0,0,0))}
                               />
                             </FormControl>
@@ -150,14 +150,14 @@ export default function NewHeroSection() {
                       />
                       <FormField
                         control={form.control}
-                        name="returnDate"
+                        name="dropoffDateTime"
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel className="font-semibold">Date de retour</FormLabel>
                             <FormControl>
                               <DateTimePicker
                                 value={field.value ? new Date(field.value) : undefined}
-                                onChange={date => field.onChange(date ? date.toISOString() : "")}
+                                onChange={date => field.onChange(date ?? undefined)}
                                 disabled={date => date < new Date(new Date().setHours(0,0,0,0))}
                               />
                             </FormControl>
