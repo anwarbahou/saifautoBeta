@@ -1,9 +1,12 @@
 [build]
-  command = "npm install && next build"
+  command = "npm install --verbose && npm run build"
   publish = ".next"
 
 [build.environment]
   NODE_VERSION = "20"
+  NPM_FLAGS = "--no-audit --no-fund"
+  NETLIFY_USE_NPM = "true"
+  NETLIFY_NEXT_PLUGIN_SKIP = "true"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs" 
