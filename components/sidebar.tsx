@@ -15,7 +15,8 @@ import {
   X,
   Car as CarIcon,
   CalendarDays,
-  FileText
+  FileText,
+  MapPin
 } from "lucide-react"
 import Image from "next/image"
 import { cn } from "@/lib/utils"
@@ -140,6 +141,7 @@ export function Sidebar({
   const links = [
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
     { name: "Cars", href: "/dashboard/cars", icon: CarIcon },
+    { name: "Track Cars", href: "/dashboard/track-cars", icon: MapPin },
     { name: "Clients", href: "/dashboard/clients", icon: Users },
     { name: "Bookings", href: "/dashboard/bookings", icon: Calendar },
     { name: "WhatsApp", href: "/dashboard/whatsapp", icon: MessageCircle },

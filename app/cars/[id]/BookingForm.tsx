@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { DateTimePicker } from "@/components/ui/DateTimePicker";
 import { Loader2 } from "lucide-react";
 import { Dialog, DialogContent, DialogOverlay, DialogTitle } from "@/components/ui/dialog";
+import { sendBookingConfirmationEmail } from "@/app/api/Resend/ResendClient";
 
 interface Car {
   id: string | number;
@@ -95,6 +96,14 @@ const BookingForm = ({ car, initialPickupDate = "", initialReturnDate = "", init
     setError("");
     setSuccess(false);
     try {
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(form.email)) {
+        setError("Veuillez entrer une adresse email valide");
+        setLoading(false);
+        return;
+      }
+
       // Validate dates
       const startDate = new Date(form.pickupDate);
       const endDate = new Date(form.returnDate);
@@ -130,6 +139,47 @@ const BookingForm = ({ car, initialPickupDate = "", initialReturnDate = "", init
 
       setSuccess(true);
       toast.success("Booking request sent successfully!");
+
+      // Send confirmation email
+      try {
+        const emailResponse = await fetch('/api/send-confirmation-email', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            customerName: `${form.firstName} ${form.lastName}`,
+            carDetails: {
+              make: car.make,
+              model: car.model,
+              year: car.year,
+              licensePlate: car.license_plate || car.licensePlate
+            },
+            bookingDetails: {
+              pickupDate: form.pickupDate,
+              returnDate: form.returnDate,
+              pickupLocation: form.pickupLocation,
+              totalPrice: car.daily_rate ? `${car.daily_rate * Math.ceil((new Date(form.returnDate).getTime() - new Date(form.pickupDate).getTime()) / (1000 * 60 * 60 * 24))}` : undefined
+            },
+            customerDetails: {
+              email: form.email,
+              phone: form.phone
+            }
+          })
+        });
+
+        const emailResult = await emailResponse.json();
+
+        if (!emailResult.success) {
+          console.error('Failed to send confirmation email:', emailResult.error);
+          toast.error("Votre réservation est confirmée, mais l'email de confirmation n'a pas pu être envoyé. Notre équipe vous contactera sous peu.");
+        } else {
+          toast.success("Un email de confirmation vous a été envoyé!");
+        }
+      } catch (error) {
+        console.error('Error sending confirmation email:', error);
+        toast.error("Votre réservation est confirmée, mais l'email de confirmation n'a pas pu être envoyé. Notre équipe vous contactera sous peu.");
+      }
 
       // ---- START: Added Twilio Notification ----
       try {

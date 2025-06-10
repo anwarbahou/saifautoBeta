@@ -1,6 +1,6 @@
 "use client"
 
-import { Car, CalendarClock, Users, LayoutDashboard, Settings, LogOut, Search, MessageCircle, PanelLeft } from "lucide-react"
+import { Car, CalendarClock, Users, LayoutDashboard, Settings, LogOut, Search, MessageCircle, PanelLeft, MapPin } from "lucide-react"
 import { usePathname, useRouter } from "next/navigation"
 import type { User } from "@supabase/supabase-js"
 import React from "react"
@@ -50,6 +50,12 @@ function DashboardSidebarContent({ user }: DashboardSidebarProps) {
       icon: <Car className="h-4 w-4" />,
       href: "/cars",
       isActive: pathname === "/cars",
+    },
+    {
+      title: "Track Cars",
+      icon: <MapPin className="h-4 w-4" />,
+      href: "/dashboard/track-cars",
+      isActive: pathname === "/dashboard/track-cars",
     },
     {
       title: "Bookings",
