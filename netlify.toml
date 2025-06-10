@@ -1,9 +1,11 @@
 [build]
-  command = "npm ci && npm run build"
+  command = "npm --loglevel verbose install && npm run build"
   publish = ".next"
 
 [build.environment]
   NODE_VERSION = "20"
+  NODE_ENV = "production"
+  CI = "true"
   NEXT_TELEMETRY_DISABLED = "1"
   NPM_FLAGS = "--no-audit --no-fund --prefer-offline"
   NETLIFY_USE_NPM = "true"
