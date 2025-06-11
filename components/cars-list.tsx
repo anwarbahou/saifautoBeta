@@ -99,6 +99,7 @@ export function CarsList() {
   const [loading, setLoading] = useState(true)
   const [editingCar, setEditingCar] = useState<CarFormData | null>(null)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [viewingCar, setViewingCar] = useState<CarCardType | null>(null)
   const [isViewModalOpen, setIsViewModalOpen] = useState(false)
   const { toast } = useToast()
@@ -383,10 +384,7 @@ export function CarsList() {
             <CardTitle className="text-2xl font-bold tracking-tight">Cars Fleet</CardTitle>
             <CardDescription>Manage your rental vehicles. View details, edit, or add new cars.</CardDescription>
           </div>
-          <Button onClick={() => setIsEditModalOpen(true)} className="whitespace-nowrap">
-            <Plus className="h-4 w-4 mr-2" />
-            Ajouter un véhicule
-          </Button>
+          <AddCarModal onAddCar={handleAddCar} />
         </div>
         <div className="mt-6 flex flex-col space-y-4 md:flex-row md:justify-between md:items-center md:space-y-0">
           <div className="w-full md:w-1/3">
